@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="container_margin_top">260dp</dimen>
+
+    <dimen name="container_height">270dp</dimen>
+
+    <dimen name="switch_width">100dp</dimen>
+    <dimen name="switch_height">170dp</dimen>
+
+    <dimen name="recycler_view_height">140dp</dimen>
+</resources>

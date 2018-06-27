@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:background="@drawable/panel_led_bg_19"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/container_margin_top" />
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/container_height">
+
+            <ImageButton
+                android:id="@+id/btn_switch"
+                android:layout_width="@dimen/switch_width"
+                android:layout_height="@dimen/switch_height"
+                android:layout_gravity="bottom"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                android:src="@drawable/panel_led_switch_19" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/recycler_view_height" />
+
+</RelativeLayout>
