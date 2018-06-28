@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 
-public class Toast {
+public class ToastUtil {
 
     public static void shortToast(Context context, String text) {
         android.widget.Toast.makeText(context, text, android.widget.Toast.LENGTH_SHORT).show();

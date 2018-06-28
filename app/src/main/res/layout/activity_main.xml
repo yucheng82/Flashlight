@@ -16,17 +16,29 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="@dimen/container_margin_top" />
+            android:layout_height="175dp" />
+
+        <TextView
+            android:id="@+id/lbl_indicator_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@android:color/white"
+            android:textSize="28sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <FrameLayout
             android:id="@+id/container"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/container_height">
+            android:layout_height="@dimen/height_container">
 
             <ImageButton
                 android:id="@+id/btn_switch"
-                android:layout_width="@dimen/switch_width"
-                android:layout_height="@dimen/switch_height"
+                android:layout_width="@dimen/width_switch"
+                android:layout_height="@dimen/height_switch"
                 android:layout_gravity="bottom"
                 android:background="@android:color/transparent"
                 android:scaleType="fitXY"
@@ -39,6 +51,6 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/recycler_view_height" />
+        android:layout_height="@dimen/height_recycler_view" />
 
 </RelativeLayout>

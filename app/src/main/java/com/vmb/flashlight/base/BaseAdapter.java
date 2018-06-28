@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.vmb.flashlight.adapter.holder.ItemHolder;
+import com.vmb.flashlight.base.holder.BaseViewHolder;
 
 import java.util.List;
 
@@ -31,11 +31,11 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(this.context);
-        return new ItemHolder(inflater.inflate(getResLayout(), viewGroup, false));
+        return new BaseViewHolder(inflater.inflate(getResLayout(), viewGroup, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-
+        ((BaseViewHolder) viewHolder).bindData(position);
     }
 }

@@ -4,9 +4,16 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-public class ItemHolder extends RecyclerView.ViewHolder {
+import com.vmb.flashlight.base.holder.BaseViewHolder;
 
-    public ItemHolder(@NonNull View itemView) {
+public class ItemHolder extends BaseViewHolder {
+
+    public ItemHolder(View itemView) {
         super(itemView);
+    }
+
+    @Override
+    public void bindData(int position) {
+
     }
 }

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="container_margin_top">260dp</dimen>
+    <dimen name="text_size_indicator_light">28sp</dimen>
 
-    <dimen name="container_height">270dp</dimen>
+    <dimen name="width_row_img">21dp</dimen>
 
-    <dimen name="switch_width">100dp</dimen>
-    <dimen name="switch_height">170dp</dimen>
+    <dimen name="height_container">270dp</dimen>
 
-    <dimen name="recycler_view_height">140dp</dimen>
+    <dimen name="width_switch">100dp</dimen>
+    <dimen name="height_switch">170dp</dimen>
+
+    <dimen name="height_recycler_view">110dp</dimen>
 </resources>
