@@ -25,3 +25,190 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+/*task convertDimens() {
+    def xmlFile320 = "${project.rootDir}/app/src/main/res/values-sw320dp/dimens.xml"
+    def xmlFile360 = "${project.rootDir}/app/src/main/res/values-sw360dp/dimens.xml"
+    def xmlFile420 = "${project.rootDir}/app/src/main/res/values-sw420dp/dimens.xml"
+    def xmlFile480 = "${project.rootDir}/app/src/main/res/values-sw480dp/dimens.xml"
+    def xmlFile540 = "${project.rootDir}/app/src/main/res/values-sw540dp/dimens.xml"
+    def xmlFile600 = "${project.rootDir}/app/src/main/res/values-sw600dp/dimens.xml"
+    def xmlFile660 = "${project.rootDir}/app/src/main/res/values-sw660dp/dimens.xml"
+    def xmlFile720 = "${project.rootDir}/app/src/main/res/values-sw720dp/dimens.xml"
+    def xmlFile780 = "${project.rootDir}/app/src/main/res/values-sw780dp/dimens.xml"
+
+    def xmlOriginal = new XmlParser().parse(xmlFile420)
+
+    def xml320 = xmlOriginal.clone()
+    def xml360 = xmlOriginal.clone()
+    def xml420 = xmlOriginal.clone()
+    def xml480 = xmlOriginal.clone()
+    def xml540 = xmlOriginal.clone()
+    def xml600 = xmlOriginal.clone()
+    def xml660 = xmlOriginal.clone()
+    def xml720 = xmlOriginal.clone()
+    def xml780 = xmlOriginal.clone()
+
+    xml320.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((320 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((320 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((320 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml360.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((360 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((360 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((360 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml420.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((420 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((420 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((420 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml480.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((480 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((480 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((480 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml540.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((540 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((540 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((540 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml600.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((600 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((600 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((600 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml660.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((660 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((660 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((660 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml720.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((720 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((720 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((720 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+    xml780.dimen.each { dimen ->
+        def value = dimen.text();
+        if (value.contains("sp")) {
+            def newValue = value.replace("sp", "").toFloat()
+            newValue = round((780 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "sp"
+        } else if (value.contains("px")) {
+            def newValue = value.replace("px", "").toFloat()
+            newValue = round((780 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "px"
+        } else {
+            def newValue = value.replace("dp", "").toFloat()
+            newValue = round((780 / 420 * newValue).toFloat(), 2);
+            dimen.value = newValue + "dp"
+        }
+    }
+
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile320))).print(xml320)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile360))).print(xml360)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile420))).print(xml420)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile480))).print(xml480)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile540))).print(xml540)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile600))).print(xml600)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile660))).print(xml660)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile720))).print(xml720)
+    new XmlNodePrinter(new PrintWriter(new FileWriter(xmlFile780))).print(xml780)
+}
+
+public static float round(float d, int decimalPlace) {
+    BigDecimal bd = new BigDecimal(Float.toString(d));
+    bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+    return bd.floatValue();
+}
+
+clean.dependsOn convertDimens*/

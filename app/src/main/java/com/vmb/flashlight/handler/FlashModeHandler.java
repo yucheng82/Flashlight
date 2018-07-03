@@ -37,7 +37,7 @@ public class FlashModeHandler {
         handler.removeCallbacks(runnable);
         switch (mode) {
             case 0:
-                if (Static.isFlashLightOn) {
+                if (!Static.isFlashLightOn) {
                     // Turn on flashlight
                     Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                     Static.camera.setParameters(Static.parameters);
@@ -47,47 +47,47 @@ public class FlashModeHandler {
                 break;
 
             case 1:
-                offsetTime = 1000;
-                handler.postDelayed(runnable, offsetTime);
-                break;
-
-            case 2:
                 offsetTime = 900;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
-            case 3:
+            case 2:
                 offsetTime = 800;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
-            case 4:
+            case 3:
                 offsetTime = 700;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
-            case 5:
+            case 4:
                 offsetTime = 600;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
-            case 6:
+            case 5:
                 offsetTime = 500;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
-            case 7:
+            case 6:
                 offsetTime = 400;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
-            case 8:
+            case 7:
                 offsetTime = 300;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
-            case 9:
+            case 8:
                 offsetTime = 200;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 9:
+                offsetTime = 100;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 

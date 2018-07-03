@@ -1,15 +1,20 @@
 package com.vmb.flashlight.ui;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.PointF;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -50,15 +55,15 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        if (!isFlashSupported())
+        if (!isFlashSupported()) {
             showNoFlashAlert();
+        }
         else {
             Static.camera = Camera.open();
             Static.parameters = Static.camera.getParameters();
+            initRecyclerView();
+            setupBehavior();
         }
-
-        initRecyclerView();
-        setupBehavior();
     }
 
     @Override
@@ -78,9 +83,9 @@ public class MainActivity extends BaseActivity {
 
     private void showNoFlashAlert() {
         new AlertDialog.Builder(this)
-                .setMessage("Your device hardware does not support flashlight!")
-                .setIcon(android.R.drawable.ic_dialog_alert).setTitle("Error")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                .setMessage(R.string.not_support)
+                .setIcon(android.R.drawable.ic_dialog_alert).setTitle(R.string.error)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -124,74 +129,90 @@ public class MainActivity extends BaseActivity {
         final PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
         final PointF StartPT = new PointF(); // Record Start Position of 'img'
 
-        final int limitY_top = (int) container.getY();
-        final int container_height = container.getLayoutParams().height;
-        final int limitY_bottom = limitY_top + container_height;
+        final int limitY_top = 0;
 
-        final int view_height = btn_switch.getLayoutParams().height;
-        final int x = (int) btn_switch.getX();
-
-        btn_switch.setOnTouchListener(new View.OnTouchListener() {
+        container.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressLint("NewApi")
+            @SuppressWarnings("deprecation")
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_MOVE:
-                        int testY = (int) (StartPT.y + event.getY() - DownPT.y);
+            public void onGlobalLayout() {
+                final int container_height = container.getHeight();
+                final int limitY_bottom = limitY_top + container_height;
 
-                        if (testY < limitY_top)
-                            break;
+                if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+                    container.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                else
+                    container.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
-                        if (testY + view_height > limitY_bottom)
-                            break;
+                Resources r = getResources();
+                final int view_height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 170, r.getDisplayMetrics());
+                final int x = (int) btn_switch.getX();
 
-                        btn_switch.setY(testY);
-                        StartPT.set(x, testY);
+                btn_switch.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_MOVE:
+                                int testY = (int) (StartPT.y + event.getY() - DownPT.y);
 
-                        if ((testY - limitY_top + view_height / 2) > (container_height / 2)) {
-                            if (!Static.isFlashLightOn)
+                                if (testY < 0)
+                                    break;
+
+                                if (testY + view_height > limitY_bottom)
+                                    break;
+
+                                btn_switch.setY(testY);
+                                StartPT.set(x, testY);
+
+                                if ((testY - limitY_top + view_height / 2) > (container_height / 2)) {
+                                    if (!Static.isFlashLightOn)
+                                        break;
+
+                                    // Turn off flashlight
+                                    Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                                    Static.camera.setParameters(Static.parameters);
+                                    //Config.camera.stopPreview();
+                                    Static.isFlashLightOn = false;
+
+                                } else {
+                                    if (Static.isFlashLightOn)
+                                        break;
+
+                                    // Turn on flashlight
+                                    Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                                    Static.camera.setParameters(Static.parameters);
+                                    Static.camera.startPreview();
+                                    Static.isFlashLightOn = true;
+
+                                    FlashModeHandler.setMode(indicator);
+                                }
                                 break;
 
-                            // Turn off flashlight
-                            Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                            Static.camera.setParameters(Static.parameters);
-                            //Config.camera.stopPreview();
-                            Static.isFlashLightOn = false;
-
-                        } else {
-                            if (Static.isFlashLightOn)
+                            case MotionEvent.ACTION_DOWN:
+                                DownPT.set(event.getX(), event.getY());
+                                StartPT.set(btn_switch.getX(), btn_switch.getY());
                                 break;
 
-                            // Turn on flashlight
-                            Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                            Static.camera.setParameters(Static.parameters);
-                            Static.camera.startPreview();
-                            Static.isFlashLightOn = true;
+                            case MotionEvent.ACTION_UP:
+                                int Y = (int) btn_switch.getY();
+                                if ((Y - limitY_top + view_height / 2) <= (container_height / 2)) {
+                                    // Set switch to ON mode position
+                                    btn_switch.setY(limitY_top);
+                                    btn_switch.setImageResource(R.drawable.panel_led_switch_on_19);
+                                } else {
+                                    // Set switch to OFF mode position
+                                    btn_switch.setY(limitY_bottom - view_height);
+                                    btn_switch.setImageResource(R.drawable.panel_led_switch_19);
+                                }
+                                break;
 
-                            FlashModeHandler.setMode(indicator);
+                            default:
+                                break;
                         }
-                        break;
 
-                    case MotionEvent.ACTION_DOWN:
-                        DownPT.set(event.getX(), event.getY());
-                        StartPT.set(btn_switch.getX(), btn_switch.getY());
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        int Y = (int) btn_switch.getY();
-                        if ((Y - limitY_top + view_height / 2) <= (container_height / 2)) {
-                            // Set switch to ON mode position
-                            btn_switch.setY(limitY_top);
-                        } else {
-                            // Set switch to OFF mode position
-                            btn_switch.setY(limitY_bottom - view_height);
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-
-                return true;
+                        return true;
+                    }
+                });
             }
         });
     }

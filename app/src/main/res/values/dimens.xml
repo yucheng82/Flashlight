@@ -1,13 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="text_size_indicator_light">28sp</dimen>
 
-    <dimen name="width_row_img">21dp</dimen>
-
-    <dimen name="height_container">270dp</dimen>
-
-    <dimen name="width_switch">100dp</dimen>
-    <dimen name="height_switch">170dp</dimen>
-
-    <dimen name="height_recycler_view">110dp</dimen>
 </resources>
