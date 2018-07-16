@@ -1,6 +1,7 @@
 package com.vmb.flashlight.base;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,23 +9,21 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.R;
+import com.vmb.flashlight.util.AdUtil;
 import com.vmb.flashlight.util.PermissionUtils;
 import com.vmb.flashlight.util.ToastUtil;
 
-public abstract class BaseActivity extends AppCompatActivity {
-
-    /*private String[] INTERNET = {Manifest.permission.INTERNET};
-    private String[] NETWORK = {Manifest.permission.ACCESS_NETWORK_STATE};
-    private String[] CAMERA = {Manifest.permission.CAMERA};*/
+public abstract class BaseActivity extends Activity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getResLayout());
-        //requestPermission();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -42,6 +41,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             initView();
             initData();
         }
+
+        FrameLayout layout_ads = findViewById(R.id.layout_ads);
+        RelativeLayout banner = findViewById(R.id.banner);
+        AdUtil.showAdBanner(getApplicationContext(), banner, layout_ads);
     }
 
     protected abstract int getResLayout();
@@ -49,20 +52,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void initView();
 
     protected abstract void initData();
-
-    /*public void requestPermission() {
-        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, Config.RequestCode.CODE_REQUEST_PERMISSION_INTERNET);
-        }
-
-        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE}, Config.RequestCode.CODE_REQUEST_PERMISSION_ACCESS_NETWORK_STATE);
-        }
-
-        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Config.RequestCode.CODE_REQUEST_PERMISSION_CAMERA);
-        }
-    }*/
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -90,5 +79,11 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        AdUtil.getIntance().displayInterstitial();
+        super.onPause();
     }
 }

@@ -3,28 +3,43 @@ package com.vmb.flashlight.handler;
 import android.hardware.Camera;
 import android.os.Handler;
 
-import com.vmb.flashlight.Static;
+import com.vmb.flashlight.model.Flashlight;
 
 public class FlashModeHandler {
 
-    private static boolean isOn = true;
-    private static int offsetTime = 0;
-    private static Handler handler = new Handler();
+    private static FlashModeHandler flashModeHandler;
 
-    private static Runnable runnable = new Runnable() {
+    private boolean isOn;
+    private int offsetTime;
+    private Handler handler;
+
+    public static FlashModeHandler getInstance() {
+        if (flashModeHandler == null) {
+            synchronized (FlashModeHandler.class) {
+                flashModeHandler = new FlashModeHandler();
+            }
+        }
+        return flashModeHandler;
+    }
+
+    public FlashModeHandler() {
+        this.isOn = true;
+        this.offsetTime = 0;
+        this.handler = new Handler();
+    }
+
+    private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            if (Static.isFlashLightOn) {
+            if (Flashlight.getInstance().isFlashLightOn()) {
                 if (isOn) {
                     // Turn off flashlight
-                    Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                    Static.camera.setParameters(Static.parameters);
+                    Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
                     isOn = false;
                 } else {
                     // Turn on flashlight
-                    Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                    Static.camera.setParameters(Static.parameters);
-                    Static.camera.startPreview();
+                    Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
+                    Flashlight.getInstance().getCamera().startPreview();
                     isOn = true;
                 }
 
@@ -33,15 +48,14 @@ public class FlashModeHandler {
         }
     };
 
-    public static void setMode(int mode) {
+    public void setMode(int mode) {
         handler.removeCallbacks(runnable);
         switch (mode) {
             case 0:
-                if (!Static.isFlashLightOn) {
+                if (Flashlight.getInstance().isFlashLightOn() == false) {
                     // Turn on flashlight
-                    Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                    Static.camera.setParameters(Static.parameters);
-                    Static.camera.startPreview();
+                    Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
+                    Flashlight.getInstance().getCamera().startPreview();
                     isOn = true;
                 }
                 break;

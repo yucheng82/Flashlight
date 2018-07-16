@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,11 +19,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.noname.quangcaoads.QuangCaoSetup;
+import com.vmb.flashlight.MainApplication;
 import com.vmb.flashlight.R;
-import com.vmb.flashlight.Static;
 import com.vmb.flashlight.adapter.ItemAdapter;
 import com.vmb.flashlight.base.BaseActivity;
 import com.vmb.flashlight.handler.FlashModeHandler;
+import com.vmb.flashlight.model.Flashlight;
+import com.vmb.flashlight.util.AdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +46,6 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        // Set fullscreen
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        // Find view
         btn_switch = findViewById(R.id.btn_switch);
         container = findViewById(R.id.container);
         lbl_indicator_light = findViewById(R.id.lbl_indicator_light);
@@ -55,12 +53,15 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData() {
+        QuangCaoSetup.initiate(MainActivity.this);
+
         if (!isFlashSupported()) {
             showNoFlashAlert();
         }
         else {
-            Static.camera = Camera.open();
-            Static.parameters = Static.camera.getParameters();
+            Camera camera = Camera.open();
+            Flashlight.getInstance().setCamera(camera);
+            Flashlight.getInstance().setParameters(camera.getParameters());
             initRecyclerView();
             setupBehavior();
         }
@@ -68,11 +69,13 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        if (Static.camera != null) {
-            Static.camera.stopPreview();
-            Static.camera.release();
-            Static.camera = null;
+        if (Flashlight.getInstance().getCamera() != null) {
+            Flashlight.getInstance().getCamera().stopPreview();
+            Flashlight.getInstance().getCamera().release();
+            Flashlight.getInstance().setCamera(null);
         }
+
+        MainApplication.getInstance().cancelDownCount();
         super.onDestroy();
     }
 
@@ -119,8 +122,8 @@ public class MainActivity extends BaseActivity {
                 indicator = recyclerView.computeHorizontalScrollOffset() / recyclerView.getChildAt(0).getMeasuredWidth();
                 lbl_indicator_light.setText(indicator + "");
 
-                if (Static.isFlashLightOn)
-                    FlashModeHandler.setMode(indicator);
+                if (Flashlight.getInstance().isFlashLightOn())
+                    FlashModeHandler.getInstance().setMode(indicator);
             }
         });
     }
@@ -155,36 +158,40 @@ public class MainActivity extends BaseActivity {
                             case MotionEvent.ACTION_MOVE:
                                 int testY = (int) (StartPT.y + event.getY() - DownPT.y);
 
-                                if (testY < 0)
+                                if (testY < 0) {
+                                    btn_switch.setY(limitY_top);
                                     break;
+                                }
 
-                                if (testY + view_height > limitY_bottom)
+                                if (testY + view_height > limitY_bottom) {
+                                    btn_switch.setY(limitY_bottom - view_height);
                                     break;
+                                }
 
                                 btn_switch.setY(testY);
                                 StartPT.set(x, testY);
 
                                 if ((testY - limitY_top + view_height / 2) > (container_height / 2)) {
-                                    if (!Static.isFlashLightOn)
+                                    if (Flashlight.getInstance().isFlashLightOn() == false)
                                         break;
 
                                     // Turn off flashlight
-                                    Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                                    Static.camera.setParameters(Static.parameters);
-                                    //Config.camera.stopPreview();
-                                    Static.isFlashLightOn = false;
+                                    Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
+                                    Flashlight.getInstance().setFlashLightOn(false);
+
+                                    btn_switch.setImageResource(R.drawable.panel_led_switch_19);
 
                                 } else {
-                                    if (Static.isFlashLightOn)
+                                    if (Flashlight.getInstance().isFlashLightOn() == true)
                                         break;
 
                                     // Turn on flashlight
-                                    Static.parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                                    Static.camera.setParameters(Static.parameters);
-                                    Static.camera.startPreview();
-                                    Static.isFlashLightOn = true;
+                                    Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
+                                    Flashlight.getInstance().getCamera().startPreview();
+                                    Flashlight.getInstance().setFlashLightOn(true);
 
-                                    FlashModeHandler.setMode(indicator);
+                                    btn_switch.setImageResource(R.drawable.panel_led_switch_on_19);
+                                    FlashModeHandler.getInstance().setMode(indicator);
                                 }
                                 break;
 
@@ -198,11 +205,10 @@ public class MainActivity extends BaseActivity {
                                 if ((Y - limitY_top + view_height / 2) <= (container_height / 2)) {
                                     // Set switch to ON mode position
                                     btn_switch.setY(limitY_top);
-                                    btn_switch.setImageResource(R.drawable.panel_led_switch_on_19);
+
                                 } else {
                                     // Set switch to OFF mode position
                                     btn_switch.setY(limitY_bottom - view_height);
-                                    btn_switch.setImageResource(R.drawable.panel_led_switch_19);
                                 }
                                 break;
 

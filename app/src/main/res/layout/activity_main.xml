@@ -59,21 +59,18 @@
                     android:background="@android:color/transparent"
                     android:scaleType="fitXY"
                     android:src="@drawable/panel_led_switch_19" />
-
             </FrameLayout>
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
-
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.5" />
-
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -81,5 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:overScrollMode="never" />
+
+    <include layout="@layout/layout_adview"/>
 
 </RelativeLayout>
