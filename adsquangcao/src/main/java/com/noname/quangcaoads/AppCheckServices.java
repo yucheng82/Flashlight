@@ -48,7 +48,7 @@ public class AppCheckServices extends Service {
     private TimerTask mTimerTask;
     private Handler handler;
     private ArrayList<String> listLauncher;
-    private boolean isInitFullScreen, hasPermissionBanner;
+    private boolean hasPermissionBanner;
     private ControlAds controlAds;
 
     @Override
@@ -91,7 +91,6 @@ public class AppCheckServices extends Service {
             }
         }
 
-        isInitFullScreen = false;
         firstBanner = false;
         timeCreate = System.currentTimeMillis();
 
@@ -157,6 +156,15 @@ public class AppCheckServices extends Service {
                 gson = new Gson();
             String strConfig = FileCacheUtil.loadConfig(context);
             controlAds = gson.fromJson(strConfig, ControlAds.class);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        AdsFullScreen.initiate(AppCheckServices.this);
+                    } catch (Exception e) {
+                    }
+                }
+            });
             scheduleShowAds(2, 1);
         } catch (Exception e) {
         }
@@ -250,28 +258,13 @@ public class AppCheckServices extends Service {
             @Override
             public void run() {
                 try {
-                    if (isScreenOn(AppCheckServices.this) &&
-                            UserPresentReceiver.isMyServiceRunning(AppCheckServices.this,
-                                    AppCheckServices.class.getName())) {
+                    if (isScreenOn(AppCheckServices.this)) {
                         LogUtils.logBlue("X_Time", "Full  " + AdsFullScreen.getTimeConLaiDeShowPopup(getApplicationContext()) +
                                 "    ---      Banner  " + getTimeConLaiDeShowBanner());
                         if (Math.min(AdsFullScreen.getTimeConLaiDeShowPopup(getApplicationContext()), getTimeConLaiDeShowBanner()) > 3000) {
                             resetAll();
                             AppCheckServices.this.stopSelf();
                             return;
-                        }
-
-                        if (!isInitFullScreen) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        AdsFullScreen.initiate(AppCheckServices.this);
-                                    } catch (Exception e) {
-                                    }
-                                }
-                            });
-                            isInitFullScreen = true;
                         }
 
                         if (hasPermissionBanner) {
@@ -304,10 +297,7 @@ public class AppCheckServices extends Service {
                 } catch (Exception e) {
                     e.printStackTrace();
                     resetAll();
-                    try {
-                        AppCheckServices.this.stopSelf();
-                    } catch (Exception e1) {
-                    }
+                    AppCheckServices.this.stopSelf();
                 }
             }
         };
@@ -364,7 +354,7 @@ public class AppCheckServices extends Service {
 
     private boolean firstBanner;
     private long timeShowOld = 0, timeCreate = 0;
-    private long timeDelayAds = 0, firstDelayAds = 0;
+    private int timeDelayAds = 0, firstDelayAds = 0;
 
     private boolean isOkBanner() {
         if (timeDelayAds == 0) {

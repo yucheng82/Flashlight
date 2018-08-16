@@ -9,9 +9,9 @@ public class FlashModeHandler {
 
     private static FlashModeHandler flashModeHandler;
 
-    private boolean isOn;
-    private int offsetTime;
-    private Handler handler;
+    private boolean isOn = true;
+    private int offsetTime = 0;
+    private Handler handler = new Handler();
 
     public static FlashModeHandler getInstance() {
         if (flashModeHandler == null) {
@@ -20,12 +20,6 @@ public class FlashModeHandler {
             }
         }
         return flashModeHandler;
-    }
-
-    public FlashModeHandler() {
-        this.isOn = true;
-        this.offsetTime = 0;
-        this.handler = new Handler();
     }
 
     private Runnable runnable = new Runnable() {

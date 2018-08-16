@@ -224,6 +224,11 @@ public class AdsBannerView extends RelativeLayout {
                 } catch (Exception e) {
                 }
             }
+
+            @Override
+            public void onLoggingImpression(Ad ad) {
+
+            }
         });
         mLnrAdview.addView(mAdViewFacebook);
     }

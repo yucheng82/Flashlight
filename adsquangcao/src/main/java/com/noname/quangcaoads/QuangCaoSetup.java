@@ -1,12 +1,7 @@
 package com.noname.quangcaoads;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.noname.quangcaoads.util.DeviceUtil;
@@ -34,18 +29,23 @@ public class QuangCaoSetup {
         SharedPreferencesGlobalUtil.setValue(context, "version", version);
     }
 
+    public static void setLinkServer(Context context, String link_server) {
+        SharedPreferencesGlobalUtil.setValue(context, "link_server", link_server);
+    }
+
     public static void initiate(Activity activity) {
         try {
             quangCaoSetup = new QuangCaoSetup();
             quangCaoSetup.setup(activity, null);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
-                }
-            }
+            // Xin quyen doc file
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//                    ActivityCompat.requestPermissions(activity,
+//                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
+//                }
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,7 +69,6 @@ public class QuangCaoSetup {
 
         this.context = context;
         this.callback = callback;
-
         client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
@@ -93,8 +92,6 @@ public class QuangCaoSetup {
         String country = SharedPreferencesGlobalUtil.getValue(context, "country");
         if (TextUtils.isEmpty(country)) {
             try {
-
-
                 Request request = new Request.Builder()
                         .url("https://ipinfo.io/json").get().build();
                 Response response = client.newCall(request).execute();
@@ -131,14 +128,16 @@ public class QuangCaoSetup {
             String timeRegister = SharedPreferencesGlobalUtil.getValue(context, "time_register");
             if (TextUtils.isEmpty(timeRegister))
                 timeRegister = String.valueOf(System.currentTimeMillis() / 1000);
-            String domain = "http://gamemobileglobal.com/api/control_s.php";
-            String url = domain + "?code=_code_&version=_version_&deviceID=_deviceID_&country=_country_&timereg=_timereg_&timenow=_timenow_&mobileNetwork=_mobileNetwork_";
+            String domain = SharedPreferencesGlobalUtil.getValue(context, "link_server");
+            if (TextUtils.isEmpty(domain)) {
+                domain = "http://sdk.gamemobjlee.com/android/apps/control_service.php";
+            }
+            String url = domain + "?code=_code_&version=_version_&deviceID=_deviceID_&country=_country_&timereg=_timereg_&timenow=_timenow_";
             url = url.replace("_code_", code);
             url = url.replace("_version_", version);
             url = url.replace("_timereg_", timeRegister);
             url = url.replace("_timenow_", String.valueOf(System.currentTimeMillis() / 1000));
             url = url.replace("_deviceID_", DeviceUtil.getDeviceId(context));
-            url = url.replace("_mobileNetwork_", DeviceUtil.getTelcoName(context));
             url = url.replace("_country_", getCountryOffline());
             Request request = new Request.Builder().url(url).get().build();
             Response response = client.newCall(request).execute();

@@ -26,16 +26,16 @@ import java.util.ArrayList;
 public class PermissionUtils {
 
     public static boolean requestPermission(Activity activity, int requestCode, String... permissions) {
+        if(activity == null)
+            return false;
 
         boolean granted = true;
         ArrayList<String> permissionsNeeded = new ArrayList<>();
 
         for (String s : permissions) {
-
             int permissionCheck = ContextCompat.checkSelfPermission(activity, s);
             boolean hasPermission = (permissionCheck == PackageManager.PERMISSION_GRANTED);
             granted &= hasPermission;
-
             if (!hasPermission) {
                 permissionsNeeded.add(s);
             }

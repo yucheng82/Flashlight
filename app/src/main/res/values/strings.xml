@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Đèn pin</string>
+    <string name="app_name">Flashlight</string>
 
-    <string name="warning_request_permission">Bạn cần cấp truyền truy cập Camra để có thể sử dụng đèn Flash</string>
+    <string name="warning_request_permission">You need to apply access to Camera to use Flashlight</string>
     <string name="ok">OK</string>
-    <string name="not_support">Thiết bị của bạn không hỗ trợ đèn Flash !</string>
-    <string name="error">Lỗi</string>
-    <string name="request_camera">Bạn chưa cấp quyền truy cập Camera để sử dụng đèn Flash</string>
+    <string name="not_support">Your device not support Flash !</string>
+    <string name="error">Error</string>
+    <string name="request_camera">You have not apply access to Camera to use Flashlight</string>
 </resources>

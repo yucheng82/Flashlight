@@ -9,7 +9,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitInitiator {
 
     public static <S> S createService(Class<S> serviceClass, String baseUrl) {
-
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)

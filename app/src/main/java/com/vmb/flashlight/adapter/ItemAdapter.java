@@ -2,10 +2,11 @@ package com.vmb.flashlight.adapter;
 
 import android.content.Context;
 
-import com.vmb.flashlight.R;
 import com.vmb.flashlight.base.BaseAdapter;
 
 import java.util.List;
+
+import flashlight.supper.flashlight.R;
 
 public class ItemAdapter extends BaseAdapter {
 

@@ -57,7 +57,12 @@ public class FacebookAdsUtils {
 				}
 			}
 
-            @Override
+			@Override
+			public void onLoggingImpression(Ad ad) {
+
+			}
+
+			@Override
 			public void onInterstitialDisplayed(Ad arg0) {
                 isShowAds = true;
 				showAfterLoad = false;

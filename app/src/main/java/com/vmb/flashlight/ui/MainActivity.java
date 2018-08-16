@@ -2,38 +2,61 @@ package com.vmb.flashlight.ui;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.hardware.Camera;
+import android.net.Uri;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.noname.quangcaoads.QuangCaoSetup;
-import com.vmb.flashlight.MainApplication;
-import com.vmb.flashlight.R;
+import com.vmb.flashlight.Config;
+import com.vmb.flashlight.Interface.IAPIControl;
+import com.vmb.flashlight.Interface.IGetCountry;
 import com.vmb.flashlight.adapter.ItemAdapter;
 import com.vmb.flashlight.base.BaseActivity;
 import com.vmb.flashlight.handler.FlashModeHandler;
+import com.vmb.flashlight.model.Ads;
 import com.vmb.flashlight.model.Flashlight;
+import com.vmb.flashlight.receiver.ConnectionReceiver;
 import com.vmb.flashlight.util.AdUtil;
+import com.vmb.flashlight.util.CountryCodeUtil;
+import com.vmb.flashlight.util.DeviceUtil;
+import com.vmb.flashlight.util.NetworkUtil;
+import com.vmb.flashlight.util.RetrofitInitiator;
+import com.vmb.flashlight.util.SharedPreferencesUtil;
+import com.vmb.flashlight.util.TimeRegUtil;
+import com.vmb.flashlight.util.ToastUtil;
+import com.vmb.touchclick.listener.OnTouchClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity {
+import flashlight.supper.flashlight.R;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    private ImageButton btn_switch;
+public class MainActivity extends BaseActivity implements IGetCountry {
+
+    private int row_lenght = 29;
+
+    private ImageView img_switch;
+    private ImageView img_setting;
     private FrameLayout container;
     private TextView lbl_indicator_light;
 
@@ -46,14 +69,42 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        btn_switch = findViewById(R.id.btn_switch);
+        img_switch = findViewById(R.id.imb_switch);
+        img_setting = findViewById(R.id.img_setting);
         container = findViewById(R.id.container);
         lbl_indicator_light = findViewById(R.id.lbl_indicator_light);
     }
 
+    public void addShortcut() {
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.VIEW");
+        intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=chemhoaqua.chemtraicay.chemca.chemchuoi"));
+
+        Intent extra = new Intent();
+        extra.putExtra("android.intent.extra.shortcut.INTENT", intent);
+        extra.putExtra("android.intent.extra.shortcut.NAME", "My app");
+        extra.putExtra("android.intent.extra.shortcut.ICON", Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.mipmap.ic_launcher));
+        extra.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+        sendBroadcast(extra);
+    }
+
     @Override
     protected void initData() {
+        addShortcut();
+
+        img_setting.setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SettingActivity.class));
+            }
+        }, getApplicationContext(), 2));
+
+        boolean sound = SharedPreferencesUtil.getPrefferBool(getApplicationContext(), "sound", true);
+        Flashlight.getInstance().setSound(sound);
+        ConnectionReceiver.getInstance().setActivity(MainActivity.this);
+
         QuangCaoSetup.initiate(MainActivity.this);
+        initGetAds();
 
         if (!isFlashSupported()) {
             showNoFlashAlert();
@@ -67,16 +118,9 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        if (Flashlight.getInstance().getCamera() != null) {
-            Flashlight.getInstance().getCamera().stopPreview();
-            Flashlight.getInstance().getCamera().release();
-            Flashlight.getInstance().setCamera(null);
-        }
-
-        MainApplication.getInstance().cancelDownCount();
-        super.onDestroy();
+    public void initGetAds() {
+        if (NetworkUtil.isNetworkAvailable(getApplicationContext()))
+            CountryCodeUtil.getCountryCode(this);
     }
 
     private boolean isFlashSupported() {
@@ -89,7 +133,6 @@ public class MainActivity extends BaseActivity {
                 .setMessage(R.string.not_support)
                 .setIcon(android.R.drawable.ic_dialog_alert).setTitle(R.string.error)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -100,7 +143,7 @@ public class MainActivity extends BaseActivity {
 
     public void initRecyclerView() {
         List<String> listData = new ArrayList<>();
-        for (int i = 0; i < 18; i++)
+        for (int i = 0; i < this.row_lenght; i++)
             listData.add("");
 
         final RecyclerView recycler = findViewById(R.id.recycler);
@@ -149,9 +192,9 @@ public class MainActivity extends BaseActivity {
 
                 Resources r = getResources();
                 final int view_height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 170, r.getDisplayMetrics());
-                final int x = (int) btn_switch.getX();
+                final int x = (int) img_switch.getX();
 
-                btn_switch.setOnTouchListener(new View.OnTouchListener() {
+                img_switch.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         switch (event.getAction()) {
@@ -159,16 +202,16 @@ public class MainActivity extends BaseActivity {
                                 int testY = (int) (StartPT.y + event.getY() - DownPT.y);
 
                                 if (testY < 0) {
-                                    btn_switch.setY(limitY_top);
+                                    img_switch.setY(limitY_top);
                                     break;
                                 }
 
                                 if (testY + view_height > limitY_bottom) {
-                                    btn_switch.setY(limitY_bottom - view_height);
+                                    img_switch.setY(limitY_bottom - view_height);
                                     break;
                                 }
 
-                                btn_switch.setY(testY);
+                                img_switch.setY(testY);
                                 StartPT.set(x, testY);
 
                                 if ((testY - limitY_top + view_height / 2) > (container_height / 2)) {
@@ -178,8 +221,10 @@ public class MainActivity extends BaseActivity {
                                     // Turn off flashlight
                                     Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
                                     Flashlight.getInstance().setFlashLightOn(false);
+                                    img_switch.setImageResource(R.drawable.img_switch_off);
+                                    Flashlight.getInstance().playToggleSound(getApplicationContext());
 
-                                    btn_switch.setImageResource(R.drawable.panel_led_switch_19);
+                                    AdUtil.getInstance().displayInterstitial();
 
                                 } else {
                                     if (Flashlight.getInstance().isFlashLightOn() == true)
@@ -187,28 +232,29 @@ public class MainActivity extends BaseActivity {
 
                                     // Turn on flashlight
                                     Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
-                                    Flashlight.getInstance().getCamera().startPreview();
                                     Flashlight.getInstance().setFlashLightOn(true);
+                                    img_switch.setImageResource(R.drawable.img_switch_on);
+                                    Flashlight.getInstance().playToggleSound(getApplicationContext());
 
-                                    btn_switch.setImageResource(R.drawable.panel_led_switch_on_19);
                                     FlashModeHandler.getInstance().setMode(indicator);
+                                    Flashlight.getInstance().getCamera().startPreview();
                                 }
                                 break;
 
                             case MotionEvent.ACTION_DOWN:
                                 DownPT.set(event.getX(), event.getY());
-                                StartPT.set(btn_switch.getX(), btn_switch.getY());
+                                StartPT.set(img_switch.getX(), img_switch.getY());
                                 break;
 
                             case MotionEvent.ACTION_UP:
-                                int Y = (int) btn_switch.getY();
+                                int Y = (int) img_switch.getY();
                                 if ((Y - limitY_top + view_height / 2) <= (container_height / 2)) {
                                     // Set switch to ON mode position
-                                    btn_switch.setY(limitY_top);
+                                    img_switch.setY(limitY_top);
 
                                 } else {
                                     // Set switch to OFF mode position
-                                    btn_switch.setY(limitY_bottom - view_height);
+                                    img_switch.setY(limitY_bottom - view_height);
                                 }
                                 break;
 
@@ -221,5 +267,71 @@ public class MainActivity extends BaseActivity {
                 });
             }
         });
+    }
+
+    @Override
+    public void onGetCountry(String country) {
+        final String TAG = "initGetAds";
+
+        final String deviceID = DeviceUtil.getDeviceId(getApplicationContext());
+        Log.d(TAG, "deviceID = " + deviceID);
+        final String code = Config.CODE_CONTROL_APP;
+        Log.d(TAG, "code = " + code);
+        final String version = Config.VERSION_APP;
+        Log.d(TAG, "version = " + version);
+        final String timereg = TimeRegUtil.getTimeRegister(getApplicationContext());
+        Log.d(TAG, "timereg = " + timereg);
+        final String packg = Config.PACKAGE_NAME;
+        Log.d(TAG, "packg = " + packg);
+
+        IAPIControl api = RetrofitInitiator.createService(IAPIControl.class, Config.Url.URL_BASE);
+        Call<Ads> call = api.getAds(deviceID, code, version, country, timereg, packg);
+        call.enqueue(new Callback<Ads>() {
+            @Override
+            public void onResponse(Call<Ads> call, Response<Ads> response) {
+                Log.d(TAG, "onResponse()");
+                if (response == null)
+                    return;
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "response.isSuccessful()");
+
+                    if (response.body() == null || isFinishing()) {
+                        Log.d(TAG, "response.body() null || activity.isFinishing()");
+                        return;
+                    }
+
+                    Ads.setInstance(response.body());
+                    if (response.body().getShow_ads() == 0)
+                        return;
+
+                    loadBannerAd();
+                    AdUtil.getInstance().initInterstitialAd(getApplicationContext());
+                    AdUtil.getInstance().initCountDown();
+                    AdUtil.getInstance().setInitGetAds(true);
+                } else {
+                    Log.d(TAG, "response.failed");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Ads> call, Throwable t) {
+                Log.d(TAG, "onFailure()");
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (Flashlight.getInstance().getCamera() != null) {
+            Flashlight.getInstance().getCamera().stopPreview();
+            Flashlight.getInstance().getCamera().release();
+            Flashlight.getInstance().setCamera(null);
+        }
+
+        AdUtil.getInstance().cancelDownCount();
+        AdUtil.getInstance().setInitGetAds(false);
+        AdUtil.getInstance().setShowPopupFirstTime(false);
+        super.onDestroy();
     }
 }

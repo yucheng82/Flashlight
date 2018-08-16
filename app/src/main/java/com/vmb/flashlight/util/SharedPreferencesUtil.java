@@ -1,25 +1,40 @@
 package com.vmb.flashlight.util;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 
 public class SharedPreferencesUtil {
 
-    public static String getValue(Context context, String key) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("game_pref_config", Context.MODE_PRIVATE);
-        String value = sharedPreferences.getString(key, null);
-        return value;
+    public static boolean getPrefferBool(Context context, String key, boolean value) {
+        if(context == null)
+            return false;
+
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(key, value);
     }
 
-    public static void setValue(Context context, String key, String value) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("game_pref_config", Context.MODE_PRIVATE);
-        Editor editor = sharedPreferences.edit();
-        if (value != null) {
-            editor.putString(key, value);
-        } else {
-            editor.remove(key);
-        }
-        editor.commit();
+    public static void putPrefferBool(Context context, String key, boolean value) {
+        if(context == null)
+            return;
+
+        Editor sharedata = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        sharedata.putBoolean(key, value);
+        sharedata.commit();
+    }
+
+    public static String getPrefferString(Context context, String key, String value) {
+        if(context == null)
+            return "";
+
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(key, value);
+    }
+
+    public static void putPrefferString(Context context, String key, String value) {
+        if(context == null)
+            return;
+
+        Editor sharedata = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        sharedata.putString(key, value);
+        sharedata.commit();
     }
 }

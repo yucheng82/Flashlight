@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.noname.quangcaoads.util.LogUtils;
+
 public class ComVsAppReceiver extends BroadcastReceiver {
 
     @Override

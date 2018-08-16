@@ -40,7 +40,6 @@ public class FileCacheUtil {
             fos.write(body.getBytes());
             fos.close();
         } catch (Exception e) {
-            e.printStackTrace();
         }
 
         try {

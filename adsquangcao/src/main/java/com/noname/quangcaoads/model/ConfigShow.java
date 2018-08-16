@@ -2,9 +2,9 @@ package com.noname.quangcaoads.model;
 
 public class ConfigShow {
 
-    private long time_start_popup, offset_show_popup, time_start_banner, offset_show_banner;
+    private int time_start_popup, offset_show_popup, time_start_banner, offset_show_banner;
 
-    public long getTime_start_popup() {
+    public int getTime_start_popup() {
         return time_start_popup;
     }
 
@@ -12,7 +12,7 @@ public class ConfigShow {
         this.time_start_popup = time_start_popup;
     }
 
-    public long getOffset_show_popup() {
+    public int getOffset_show_popup() {
         return offset_show_popup;
     }
 
@@ -20,7 +20,7 @@ public class ConfigShow {
         this.offset_show_popup = offset_show_popup;
     }
 
-    public long getTime_start_banner() {
+    public int getTime_start_banner() {
         return time_start_banner;
     }
 
@@ -28,7 +28,7 @@ public class ConfigShow {
         this.time_start_banner = time_start_banner;
     }
 
-    public long getOffset_show_banner() {
+    public int getOffset_show_banner() {
         return offset_show_banner;
     }
 

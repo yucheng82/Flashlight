@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Đèn pin</string>
+
+    <string name="warning_request_permission">Bạn cần cấp truyền truy cập Camra để có thể sử dụng đèn Flash</string>
+    <string name="ok">OK</string>
+    <string name="not_support">Thiết bị của bạn không hỗ trợ đèn Flash !</string>
+    <string name="error">Lỗi</string>
+    <string name="request_camera">Bạn chưa cấp quyền truy cập Camera để sử dụng đèn Flash</string>
+</resources>

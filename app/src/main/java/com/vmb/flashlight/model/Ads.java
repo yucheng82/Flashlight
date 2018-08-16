@@ -36,6 +36,12 @@ public class Ads {
         }
     }
 
+    private int show_ads = 0;
+
+    public int getShow_ads() {
+        return show_ads;
+    }
+
     private Ads.config config;
 
     public Ads.config getConfig() {

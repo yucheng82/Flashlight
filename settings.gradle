@@ -1,1 +1,1 @@
-include ':app', ':adsquangcao'
+include ':app', ':touchclick', 'adsquangcao'

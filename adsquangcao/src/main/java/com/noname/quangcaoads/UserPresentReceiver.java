@@ -32,7 +32,7 @@ public class UserPresentReceiver extends BroadcastReceiver {
         }
     }
 
-    public static boolean isMyServiceRunning(Context context, String serviceName) {
+    private boolean isMyServiceRunning(Context context, String serviceName) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceName.equals(service.service.getClassName()) &&

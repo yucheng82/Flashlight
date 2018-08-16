@@ -1,6 +1,10 @@
 package com.vmb.flashlight.model;
 
+import android.content.Context;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
+
+import flashlight.supper.flashlight.R;
 
 public class Flashlight {
 
@@ -8,24 +12,35 @@ public class Flashlight {
 
     private Camera camera;
     private Camera.Parameters parameters;
-    private boolean isFlashLightOn;
+    private boolean isFlashLightOn = false;
+    private boolean sound = true;
 
     public static Flashlight getInstance() {
         if (flashlight == null) {
             synchronized (Flashlight.class) {
-                flashlight = new Flashlight(false);
+                flashlight = new Flashlight();
             }
         }
         return flashlight;
     }
 
-    public Flashlight(boolean isFlashLightOn) {
-        this.isFlashLightOn = isFlashLightOn;
-    }
-
     public void toggle(String value) {
         this.parameters.setFlashMode(value);
         this.camera.setParameters(this.parameters);
+    }
+
+    public void playToggleSound(Context context) {
+        if (context == null || this.sound == false)
+            return;
+
+        MediaPlayer mp = MediaPlayer.create(context, R.raw.sound_toggle);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.reset();
+            }
+        });
+        mp.start();
     }
 
     // Get
@@ -41,6 +56,10 @@ public class Flashlight {
         return isFlashLightOn;
     }
 
+    public boolean isSound() {
+        return sound;
+    }
+
     // Set
     public void setCamera(Camera camera) {
         this.camera = camera;
@@ -52,5 +71,9 @@ public class Flashlight {
 
     public void setFlashLightOn(boolean flashLightOn) {
         isFlashLightOn = flashLightOn;
+    }
+
+    public void setSound(boolean sound) {
+        this.sound = sound;
     }
 }

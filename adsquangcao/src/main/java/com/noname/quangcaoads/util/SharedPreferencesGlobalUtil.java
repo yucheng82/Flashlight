@@ -31,7 +31,6 @@ public class SharedPreferencesGlobalUtil {
             }
         }
         return value;
-
     }
 
     public static void setValue(Context context, String key, String value) {

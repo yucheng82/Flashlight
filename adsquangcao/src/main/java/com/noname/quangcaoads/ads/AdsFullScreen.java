@@ -19,7 +19,7 @@ public class AdsFullScreen {
     private static Gson gson;
 
     private static long timeShowOld = 0, timeCreate = 0;
-    private static long timeDelayAds = 0, firstDelayAds = 0;
+    private static int timeDelayAds = 0, firstDelayAds = 0;
     private static boolean firstShow = false;
 
     private static Gson getGson() {
