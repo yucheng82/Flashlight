@@ -36,6 +36,31 @@ public class Ads {
         }
     }
 
+    private Ads.facebook facebook;
+
+    public Ads.facebook getFacebook() {
+        return this.facebook;
+    }
+
+    public class facebook {
+        private String banner = "";
+        private String popup = "";
+
+        public String getBanner() {
+            return banner;
+        }
+
+        public String getPopup() {
+            return popup;
+        }
+    }
+
+    private String ads_network = "admob";
+
+    public String getAds_network() {
+        return ads_network;
+    }
+
     private int show_ads = 0;
 
     public int getShow_ads() {
@@ -59,5 +84,36 @@ public class Ads {
         public int getOffset_time_show_popup() {
             return offset_time_show_popup;
         }
+    }
+
+    private int update_status = 0;
+    private String update_title_vn = "Thông báo cập nhật";
+    private String update_title_en = "Update app";
+    private String update_message_vn = "Đã có phiên bản mới, bạn vui lòng cập nhật";
+    private String update_message_en = "There is a new version, please update soon!";
+    private String update_url = "https://play.google.com/store/apps/details?id=com.hdv.bigcoin.free";
+
+    public int getUpdate_status() {
+        return update_status;
+    }
+
+    public String getUpdate_title_vn() {
+        return update_title_vn;
+    }
+
+    public String getUpdate_title_en() {
+        return update_title_en;
+    }
+
+    public String getUpdate_message_vn() {
+        return update_message_vn;
+    }
+
+    public String getUpdate_message_en() {
+        return update_message_en;
+    }
+
+    public String getUpdate_url() {
+        return update_url;
     }
 }

@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.vmb.flashlight.ui.MainActivity;
-import com.vmb.flashlight.util.AdUtil;
+import com.vmb.flashlight.util.AdsUtil;
 import com.vmb.flashlight.util.NetworkUtil;
 
 /**
@@ -49,7 +49,7 @@ public class ConnectionReceiver extends BroadcastReceiver {
 
             if (activity instanceof MainActivity) {
                 MainActivity mainActivity = (MainActivity) activity;
-                if (!AdUtil.getInstance().isInitGetAds()) {
+                if (!AdsUtil.getInstance().isInitGetAds()) {
                     mainActivity.initGetAds();
                 }
             }

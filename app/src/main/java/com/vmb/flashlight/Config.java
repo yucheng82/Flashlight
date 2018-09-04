@@ -7,8 +7,11 @@ public class Config {
     public static final String VERSION_APP = BuildConfig.VERSION_NAME;
     public static final String CODE_CONTROL_APP = "50384";
 
-    public static final String ID_BANNER_AD_UNIT = "/112517806/125581528882973";
-    public static final String ID_POPUP_AD_UNIT = "/112517806/325581528882973";
+    public static final String ID_BANNER_ADMOB_UNIT = "/112517806/125581528882973";
+    public static final String ID_POPUP_ADMOB_UNIT = "/112517806/325581528882973";
+
+    public static final String ID_BANNER_FB_UNIT = "1096900620338191_2211887935506115";
+    public static final String ID_POPUP_FB_UNIT = "1096900620338191_2211896542171921";
 
     public class RequestCode {
         public static final int CODE_REQUEST_PERMISSION_CAMERA = 0;

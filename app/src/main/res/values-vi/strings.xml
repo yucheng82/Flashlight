@@ -6,4 +6,8 @@
     <string name="not_support">Thiết bị của bạn không hỗ trợ đèn Flash !</string>
     <string name="error">Lỗi</string>
     <string name="request_camera">Bạn chưa cấp quyền truy cập Camera để sử dụng đèn Flash</string>
+    <string name="update">Cập nhật</string>
+    <string name="notification">Thông báo</string>
+    <string name="loading">Đang tải</string>
+    <string name="press_back_again">Ấn back lần nữa để thoát</string>
 </resources>

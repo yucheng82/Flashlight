@@ -46,7 +46,7 @@ public class FlashModeHandler {
         handler.removeCallbacks(runnable);
         switch (mode) {
             case 0:
-                if (Flashlight.getInstance().isFlashLightOn() == false) {
+                if (Flashlight.getInstance().isFlashLightOn() == true) {
                     // Turn on flashlight
                     Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
                     Flashlight.getInstance().getCamera().startPreview();
@@ -55,47 +55,102 @@ public class FlashModeHandler {
                 break;
 
             case 1:
-                offsetTime = 900;
+                offsetTime = 1000;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 2:
-                offsetTime = 800;
+                offsetTime = 950;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 3:
-                offsetTime = 700;
+                offsetTime = 900;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 4:
-                offsetTime = 600;
+                offsetTime = 850;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 5:
-                offsetTime = 500;
+                offsetTime = 800;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 6:
-                offsetTime = 400;
+                offsetTime = 750;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 7:
-                offsetTime = 300;
+                offsetTime = 700;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 8:
-                offsetTime = 200;
+                offsetTime = 650;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 
             case 9:
+                offsetTime = 600;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 10:
+                offsetTime = 550;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 11:
+                offsetTime = 500;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 12:
+                offsetTime = 450;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 13:
+                offsetTime = 400;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 14:
+                offsetTime = 350;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 15:
+                offsetTime = 300;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 16:
+                offsetTime = 250;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 17:
+                offsetTime = 200;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 18:
+                offsetTime = 150;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 19:
                 offsetTime = 100;
+                handler.postDelayed(runnable, offsetTime);
+                break;
+
+            case 20:
+                offsetTime = 50;
                 handler.postDelayed(runnable, offsetTime);
                 break;
 

@@ -5,7 +5,7 @@
     android:paddingRight="8dp">
 
     <ImageView
-        android:layout_width="10dp"
+        android:layout_width="@dimen/width_row"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
         android:src="@drawable/img_row" />

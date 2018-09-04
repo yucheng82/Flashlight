@@ -1,2 +1,4 @@
 <resources>
+    <dimen name="height_switch">185dp</dimen>
+    <dimen name="width_row">10dp</dimen>
 </resources>

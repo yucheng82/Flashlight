@@ -81,7 +81,7 @@
                         <ImageView
                             android:id="@+id/imb_switch"
                             android:layout_width="match_parent"
-                            android:layout_height="185dp"
+                            android:layout_height="@dimen/height_switch"
                             android:layout_gravity="bottom"
                             android:background="@android:color/transparent"
                             android:scaleType="fitXY"

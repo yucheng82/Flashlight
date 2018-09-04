@@ -24,7 +24,14 @@ public class Flashlight {
         return flashlight;
     }
 
+    public void setInstance(Flashlight flashlight) {
+        this.flashlight = flashlight;
+    }
+
     public void toggle(String value) {
+        if (this.parameters == null || this.camera == null)
+            return;
+
         this.parameters.setFlashMode(value);
         this.camera.setParameters(this.parameters);
     }

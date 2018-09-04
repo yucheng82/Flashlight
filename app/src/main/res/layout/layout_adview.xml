@@ -7,10 +7,9 @@
 
     <RelativeLayout
         android:id="@+id/banner"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_gravity="bottom" />
+        android:layout_gravity="bottom|center_horizontal" />
 
     <!--<com.google.android.gms.ads.AdView
         android:id="@+id/adView"
