@@ -15,6 +15,7 @@ public class Config {
 
     public class RequestCode {
         public static final int CODE_REQUEST_PERMISSION_CAMERA = 0;
+        public static final int CODE_REQUEST_PERMISSION_CAMERA_IN_SET_MODE = 1;
     }
 
     public class Url {

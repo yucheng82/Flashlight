@@ -2,6 +2,7 @@ package com.vmb.flashlight.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,8 @@ import java.util.Calendar;
 
 public class AdmobUtil {
     private static AdmobUtil admobUtil;
+
+    private AdView adView;
     private InterstitialAd interstitialAd;
 
     private boolean isLoadFailedBanner = false;
@@ -39,11 +42,21 @@ public class AdmobUtil {
     public void initBannerAdmob(final Context context, final RelativeLayout banner, final FrameLayout layout_ads) {
         final String TAG_BANNER = "initBannerAdmob";
 
-        if(context == null)
+        if (context == null)
             return;
 
-        final AdView adView = new AdView(context);
+        String bannerId = Config.ID_BANNER_ADMOB_UNIT;
+        if (Ads.getInstance().getAdmob() != null) {
+            bannerId = Ads.getInstance().getAdmob().getBanner();
+            if (TextUtils.isEmpty(bannerId))
+                bannerId = Config.ID_BANNER_ADMOB_UNIT;
+        }
+        Log.i(TAG_BANNER, "bannerId = " + bannerId);
+
+        adView = new AdView(context);
         adView.setAdSize(AdSize.SMART_BANNER);
+        adView.setAdUnitId(bannerId);
+
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
@@ -61,7 +74,7 @@ public class AdmobUtil {
                 countLoadFailBanner++;
                 Log.i(TAG_BANNER, "countLoadFail = " + countLoadFailBanner);
                 if (countLoadFailBanner <= 3) {
-                    loadAdView(context, adView);
+                    loadAdView(adView);
                 } else {
                     isLoadFailedBanner = true;
                     Log.d(TAG_BANNER, "countLoadFailBanner > 3");
@@ -88,34 +101,34 @@ public class AdmobUtil {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
-                Log.d(TAG_BANNER, "onAdLoaded()");
 
-                if (layout_ads.getVisibility() == View.GONE) {
-                    layout_ads.setVisibility(View.VISIBLE);
-                    banner.setVisibility(View.VISIBLE);
-                    banner.addView(adView);
-                }
+                layout_ads.setVisibility(View.VISIBLE);
+                banner.setVisibility(View.VISIBLE);
+
+                Log.d(TAG_BANNER, "onAdLoaded()");
             }
         });
 
-        String bannerId = Config.ID_BANNER_ADMOB_UNIT;
-        if (Ads.getInstance().getAdmob() != null) {
-            bannerId = Ads.getInstance().getAdmob().getBanner();
-            if (TextUtils.isEmpty(bannerId))
-                bannerId = Config.ID_BANNER_ADMOB_UNIT;
-        }
-        Log.i(TAG_BANNER, "bannerId = " + bannerId);
-        adView.setAdUnitId(bannerId);
-        loadAdView(context, adView);
+        banner.removeAllViews();
+        banner.addView(adView);
+
+        loadAdView(adView);
     }
 
-    public void loadAdView(Context context, AdView adView) {
-        if(!NetworkUtil.isNetworkAvailable(context))
-            return;
-
+    public void loadAdView(final AdView adView) {
         // load banner ads
-        AdRequest adRequestFull = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
-        adView.loadAd(adRequestFull);
+        final AdRequest adRequest = new AdRequest.Builder().build();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adView.loadAd(adRequest);
+                    }
+                }).run();
+            }
+        }, 1000);
     }
 
     public void initInterstitialAdmob(final Activity activity) {
@@ -125,6 +138,16 @@ public class AdmobUtil {
             return;
 
         interstitialAd = new InterstitialAd(activity);
+
+        String popupId = Config.ID_POPUP_ADMOB_UNIT;
+        if (Ads.getInstance().getAdmob() != null) {
+            popupId = Ads.getInstance().getAdmob().getPopup();
+            if (TextUtils.isEmpty(popupId))
+                popupId = Config.ID_POPUP_ADMOB_UNIT;
+        }
+        Log.i(TAG_POPUP, "popupId = " + popupId);
+        interstitialAd.setAdUnitId(popupId);
+
         interstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLeftApplication() {
@@ -143,7 +166,7 @@ public class AdmobUtil {
                 }
 
                 countLoadFailPopup = 1;
-                loadPopup(activity);
+                loadPopup();
             }
 
             @Override
@@ -160,7 +183,7 @@ public class AdmobUtil {
                 countLoadFailPopup++;
                 Log.i(TAG_POPUP, "countLoadFail = " + countLoadFailPopup);
                 if (countLoadFailPopup <= 3) {
-                    loadPopup(activity);
+                    loadPopup();
                 } else {
                     Log.d(TAG_POPUP, "countLoadFailPopup > 3");
                 }
@@ -173,25 +196,24 @@ public class AdmobUtil {
             }
         });
 
-        String popupId = Config.ID_POPUP_ADMOB_UNIT;
-        if (Ads.getInstance().getAdmob() != null) {
-            popupId = Ads.getInstance().getAdmob().getPopup();
-            if (TextUtils.isEmpty(popupId))
-                popupId = Config.ID_POPUP_ADMOB_UNIT;
-        }
-        Log.i(TAG_POPUP, "popupId = " + popupId);
-        interstitialAd.setAdUnitId(popupId);
-        loadPopup(activity);
+        loadPopup();
     }
 
-    public void loadPopup(Context context) {
-        if(!NetworkUtil.isNetworkAvailable(context))
-            return;
-
-        // Create ad request.
-        AdRequest adRequestFull = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
-        // Begin loading your interstitial.
-        interstitialAd.loadAd(adRequestFull);
+    public void loadPopup() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Create ad request.
+                        AdRequest adRequestFull = new AdRequest.Builder().build();
+                        // Begin loading your interstitial.
+                        interstitialAd.loadAd(adRequestFull);
+                    }
+                }).run();
+            }
+        }, 1000);
     }
 
     public void displayInterstitial() {
@@ -201,7 +223,7 @@ public class AdmobUtil {
             return;
         }
 
-        if(AdsUtil.getInstance().isShowPopupCloseApp()) {
+        if (AdsUtil.getInstance().isShowPopupCloseApp()) {
             if (interstitialAd.isLoaded()) {
                 interstitialAd.show();
                 Log.d(TAG, "displayCloseApp()");

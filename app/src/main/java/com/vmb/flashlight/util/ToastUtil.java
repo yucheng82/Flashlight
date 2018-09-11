@@ -53,13 +53,14 @@ public class ToastUtil {
         view.setBackgroundColor(Color.BLACK);
         ((TextView) view.findViewById(android.support.design.R.id.snackbar_text)).setTextColor(Color.WHITE);
         ((TextView) view.findViewById(android.support.design.R.id.snackbar_action)).setTextColor(Color.GREEN);
+        snackbar.show();
     }
 
     public static void customLongSnackbar(Activity activity, String text, String click) {
         if(activity == null)
             return;
 
-        Snackbar snackbar = Snackbar.make(activity.findViewById(android.R.id.content), text, Snackbar.LENGTH_LONG).setAction(click, new View.OnClickListener() {
+        final Snackbar snackbar = Snackbar.make(activity.findViewById(android.R.id.content), text, Snackbar.LENGTH_LONG).setAction(click, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -70,5 +71,6 @@ public class ToastUtil {
         view.setBackgroundColor(Color.BLACK);
         ((TextView) view.findViewById(android.support.design.R.id.snackbar_text)).setTextColor(Color.WHITE);
         ((TextView) view.findViewById(android.support.design.R.id.snackbar_action)).setTextColor(Color.GREEN);
+        snackbar.show();
     }
 }

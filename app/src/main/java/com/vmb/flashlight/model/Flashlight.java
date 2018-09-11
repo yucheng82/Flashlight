@@ -32,8 +32,12 @@ public class Flashlight {
         if (this.parameters == null || this.camera == null)
             return;
 
-        this.parameters.setFlashMode(value);
-        this.camera.setParameters(this.parameters);
+        try {
+            this.parameters.setFlashMode(value);
+            this.camera.setParameters(this.parameters);
+        } catch (Exception e) {
+            return;
+        }
     }
 
     public void playToggleSound(Context context) {
@@ -41,6 +45,34 @@ public class Flashlight {
             return;
 
         MediaPlayer mp = MediaPlayer.create(context, R.raw.sound_toggle);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.reset();
+            }
+        });
+        mp.start();
+    }
+
+    public void playMoveSound(Context context) {
+        if (context == null || this.sound == false)
+            return;
+
+        MediaPlayer mp = MediaPlayer.create(context, R.raw.adjustment_move);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.reset();
+            }
+        });
+        mp.start();
+    }
+
+    public void playEndSound(Context context) {
+        if (context == null || this.sound == false)
+            return;
+
+        MediaPlayer mp = MediaPlayer.create(context, R.raw.adjustment_end);
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {

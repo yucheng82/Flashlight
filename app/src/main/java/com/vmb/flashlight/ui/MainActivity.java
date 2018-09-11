@@ -3,7 +3,6 @@ package com.vmb.flashlight.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
@@ -14,7 +13,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -61,6 +59,9 @@ public class MainActivity extends Activity implements IGetCountry {
 
     private int row_lenght = 40;
 
+    private FrameLayout layout_ads;
+    private RelativeLayout banner;
+
     private ImageView img_switch;
     private ImageView img_setting;
     private FrameLayout container;
@@ -70,24 +71,22 @@ public class MainActivity extends Activity implements IGetCountry {
     private int countBack = 0;
 
     private Intent intent;
-    private Handler handler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(getResLayout());
+        initView();
+        initData();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 PermissionUtils.requestPermission(this, Config.RequestCode.CODE_REQUEST_PERMISSION_CAMERA, Manifest.permission.CAMERA);
+            } else {
+                setupCamera();
             }
-        }
-
-        if (NetworkUtil.isNetworkAvailable(getApplicationContext()))
-            initGetAds();
-        else {
-            setContentView(getResLayout());
-            initView();
-            initData();
+        } else {
+            setupCamera();
         }
     }
 
@@ -105,13 +104,14 @@ public class MainActivity extends Activity implements IGetCountry {
     protected void initData() {
         if (!isFlashSupported()) {
             showNoFlashAlert();
-        } else {
-            setupBehavior();
-            initRecyclerView();
-            Camera camera = Camera.open();
-            Flashlight.getInstance().setCamera(camera);
-            Flashlight.getInstance().setParameters(camera.getParameters());
+            return;
         }
+        layout_ads = findViewById(R.id.layout_ads);
+        banner = findViewById(R.id.banner);
+        initGetAds();
+
+        setupBehavior();
+        initRecyclerView();
 
         img_setting.setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
             @Override
@@ -133,44 +133,40 @@ public class MainActivity extends Activity implements IGetCountry {
         }).run();
     }
 
+    public void setupCamera() {
+        if (Flashlight.getInstance().getCamera() == null) {
+            Camera camera = null;
+            try {
+                camera = Camera.open();
+            } catch (Exception e) {
+                ToastUtil.longToast(getApplicationContext(), getString(R.string.failed_camera));
+                return;
+            }
+            if (camera == null) {
+                ToastUtil.longToast(getApplicationContext(), getString(R.string.failed_camera));
+                return;
+            }
+
+            Flashlight.getInstance().setCamera(camera);
+            Flashlight.getInstance().setParameters(camera.getParameters());
+        }
+    }
+
     public void initGetAds() {
-        if (NetworkUtil.isNetworkAvailable(getApplicationContext())) {
+        if (NetworkUtil.isNetworkAvailable(getApplicationContext()))
             CountryCodeUtil.getCountryCode(this);
-            handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(!AdsUtil.getInstance().isInitGetAds()) {
-                        setContentView(getResLayout());
-                        initView();
-                        initData();
-                    }
-                }
-            }, 5000);
-        }
-        else {
-            setContentView(getResLayout());
-            initView();
-            initData();
-        }
     }
 
     private boolean isFlashSupported() {
         PackageManager pm = getPackageManager();
-        return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+        if (pm != null)
+            return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+        else
+            return false;
     }
 
     private void showNoFlashAlert() {
-        new AlertDialog.Builder(this)
-                .setMessage(R.string.not_support)
-                .setIcon(android.R.drawable.ic_dialog_alert).setTitle(R.string.error)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                }).show();
+        ToastUtil.longToast(getApplicationContext(), getString(R.string.not_support));
     }
 
     public void initRecyclerView() {
@@ -194,12 +190,21 @@ public class MainActivity extends Activity implements IGetCountry {
         recycler.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                indicator = recyclerView.computeHorizontalScrollOffset() / recyclerView.getChildAt(0).getMeasuredWidth();
-                lbl_indicator_light.setText(indicator + "");
                 countBack = 0;
 
+                int check = indicator;
+                indicator = recyclerView.computeHorizontalScrollOffset() / recyclerView.getChildAt(0).getMeasuredWidth();
+                lbl_indicator_light.setText(indicator + "");
+
+                if (check != indicator) {
+                    Flashlight.getInstance().playMoveSound(getApplicationContext());
+
+                    if (indicator == 0 || indicator == 20)
+                        Flashlight.getInstance().playEndSound(getApplicationContext());
+                }
+
                 if (Flashlight.getInstance().isFlashLightOn())
-                    FlashModeHandler.getInstance().setMode(indicator);
+                    FlashModeHandler.getInstance().setMode(MainActivity.this, indicator);
             }
         });
     }
@@ -237,13 +242,35 @@ public class MainActivity extends Activity implements IGetCountry {
                             case MotionEvent.ACTION_MOVE:
                                 int testY = (int) (StartPT.y + event.getY() - DownPT.y);
 
-                                if (testY < 0) {
+                                if (testY < limitY_top) {
                                     img_switch.setY(limitY_top);
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AdsUtil.getInstance().displayInterstitial();
+                                                }
+                                            }).run();
+                                        }
+                                    }, 1000);
                                     break;
                                 }
 
                                 if (testY + view_height > limitY_bottom) {
                                     img_switch.setY(limitY_bottom - view_height);
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AdsUtil.getInstance().displayInterstitial();
+                                                }
+                                            }).run();
+                                        }
+                                    }, 1000);
                                     break;
                                 }
 
@@ -261,17 +288,26 @@ public class MainActivity extends Activity implements IGetCountry {
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            img_switch.setImageResource(R.drawable.img_switch_off);
-                                            Flashlight.getInstance().playToggleSound(getApplicationContext());
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    img_switch.setImageResource(R.drawable.img_switch_off);
+                                                }
+                                            }).run();
                                         }
                                     }, 50);
 
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            AdsUtil.getInstance().displayInterstitial();
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Flashlight.getInstance().playToggleSound(getApplicationContext());
+                                                }
+                                            }).run();
                                         }
-                                    }, 1000);
+                                    }, 100);
 
                                 } else {
                                     if (Flashlight.getInstance().isFlashLightOn() == true)
@@ -279,22 +315,31 @@ public class MainActivity extends Activity implements IGetCountry {
 
                                     // Turn on flashlight
                                     Flashlight.getInstance().setFlashLightOn(true);
-                                    FlashModeHandler.getInstance().setMode(indicator);
+                                    FlashModeHandler.getInstance().setMode(MainActivity.this, indicator);
 
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            img_switch.setImageResource(R.drawable.img_switch_on);
-                                            Flashlight.getInstance().playToggleSound(getApplicationContext());
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    img_switch.setImageResource(R.drawable.img_switch_on);
+                                                }
+                                            }).run();
                                         }
                                     }, 50);
 
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            AdsUtil.getInstance().displayInterstitial();
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Flashlight.getInstance().playToggleSound(getApplicationContext());
+                                                }
+                                            }).run();
                                         }
-                                    }, 1000);
+                                    }, 100);
                                 }
                                 break;
 
@@ -322,6 +367,12 @@ public class MainActivity extends Activity implements IGetCountry {
                         return true;
                     }
                 });
+
+                boolean on = Flashlight.getInstance().isFlashLightOn();
+                if (on) {
+                    img_switch.setImageResource(R.drawable.img_switch_on);
+                    img_switch.setY(limitY_top);
+                }
             }
         });
     }
@@ -329,7 +380,6 @@ public class MainActivity extends Activity implements IGetCountry {
     @Override
     public void onGetCountry(final String country) {
         final String TAG = "onGetCountry";
-
         if (isFinishing()) {
             Log.d(TAG, "activity.isFinishing()");
             return;
@@ -367,30 +417,22 @@ public class MainActivity extends Activity implements IGetCountry {
                     if (response.body().getShow_ads() == 0)
                         return;
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
-                            FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
+                    if (Ads.getInstance().getUpdate_status() != 0) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("update_title_vn", Ads.getInstance().getUpdate_title_vn());
+                        bundle.putString("update_title_en", Ads.getInstance().getUpdate_title_en());
+                        bundle.putString("update_message_vn", Ads.getInstance().getUpdate_message_vn());
+                        bundle.putString("update_message_en", Ads.getInstance().getUpdate_message_en());
+                        bundle.putString("update_url", Ads.getInstance().getUpdate_url());
+
+                        if (Ads.getInstance().getUpdate_status() == 1) {
+                            intent = new Intent(MainActivity.this, SplashActivity.class);
+                            intent.putExtras(bundle);
+                        } else if (Ads.getInstance().getUpdate_status() == 2) {
+                            intent = new Intent(MainActivity.this, RequireActivity.class);
+                            intent.putExtras(bundle);
                         }
-                    }).run();
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString("update_title_vn", Ads.getInstance().getUpdate_title_vn());
-                    bundle.putString("update_title_en", Ads.getInstance().getUpdate_title_en());
-                    bundle.putString("update_message_vn", Ads.getInstance().getUpdate_message_vn());
-                    bundle.putString("update_message_en", Ads.getInstance().getUpdate_message_en());
-                    bundle.putString("update_url", Ads.getInstance().getUpdate_url());
-
-                    if (Ads.getInstance().getUpdate_status() == 1) {
-                        intent = new Intent(MainActivity.this, SplashActivity.class);
-                        intent.putExtras(bundle);
-                    } else if (Ads.getInstance().getUpdate_status() == 2) {
-                        intent = new Intent(MainActivity.this, RequireActivity.class);
-                        intent.putExtras(bundle);
-                    }
-
-                    if (Ads.getInstance().getUpdate_status() == 1 || Ads.getInstance().getUpdate_status() == 2) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -400,31 +442,34 @@ public class MainActivity extends Activity implements IGetCountry {
                         });
                     }
 
-                    AdsUtil.getInstance().setInitGetAds(true);
                     AdsUtil.getInstance().initCountDown();
 
-                    setContentView(getResLayout());
-                    initView();
-                    initData();
-
-                    new Thread(new Runnable() {
+                    new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    final FrameLayout layout_ads = findViewById(R.id.layout_ads);
-                                    final RelativeLayout banner = findViewById(R.id.banner);
-
-                                    if (Ads.getInstance().getAds_network().equals("admob")) {
-                                        AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
-                                    } else {
-                                        FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
-                                    }
-                                }
-                            });
+                            if (Ads.getInstance().getAds_network().equals("facebook")) {
+                                AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
+                            } else {
+                                FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
+                            }
                         }
-                    }).run();
+                    }, 1000);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
+                        }
+                    }, 5000);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
+                        }
+                    }, 7000);
+
+                    AdsUtil.getInstance().setInitGetAds(true);
 
                 } else {
                     Log.d(TAG, "response.failed");
@@ -444,24 +489,37 @@ public class MainActivity extends Activity implements IGetCountry {
 
         switch (requestCode) {
             case Config.RequestCode.CODE_REQUEST_PERMISSION_CAMERA:
-                if (!PermissionUtils.permissionGranted(requestCode, Config.RequestCode.CODE_REQUEST_PERMISSION_CAMERA, grantResults)) {
+                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     ToastUtil.longToast(getApplicationContext(), getString(R.string.warning_request_permission));
+                } else {
+                    setupCamera();
                 }
+                break;
+
+            case Config.RequestCode.CODE_REQUEST_PERMISSION_CAMERA_IN_SET_MODE:
+                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ToastUtil.longToast(getApplicationContext(), getString(R.string.warning_request_permission));
+                } else {
+                    setupCamera();
+                    FlashModeHandler.getInstance().setMode(MainActivity.this, indicator);
+                }
+                break;
+
+            default:
                 break;
         }
     }
 
     @Override
     protected void onDestroy() {
-        if (Flashlight.getInstance().getCamera() != null) {
+        /*if (Flashlight.getInstance().getCamera() != null) {
             Flashlight.getInstance().getCamera().stopPreview();
             Flashlight.getInstance().getCamera().release();
             Flashlight.getInstance().setInstance(null);
-        }
+        }*/
 
         AdsUtil.getInstance().cancelDownCount();
         AdsUtil.getInstance().setInstance(null);
-
         super.onDestroy();
     }
 

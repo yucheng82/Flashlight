@@ -10,4 +10,5 @@
     <string name="notification">Thông báo</string>
     <string name="loading">Đang tải</string>
     <string name="press_back_again">Ấn back lần nữa để thoát</string>
+    <string name="failed_camera">Không thể kết nối đến Flash</string>
 </resources>

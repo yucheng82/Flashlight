@@ -1,9 +1,19 @@
 package com.vmb.flashlight.handler;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 
+import com.vmb.flashlight.Config;
 import com.vmb.flashlight.model.Flashlight;
+import com.vmb.flashlight.util.PermissionUtils;
+import com.vmb.flashlight.util.ToastUtil;
+
+import flashlight.supper.flashlight.R;
 
 public class FlashModeHandler {
 
@@ -32,8 +42,20 @@ public class FlashModeHandler {
                     isOn = false;
                 } else {
                     // Turn on flashlight
+                    if(Flashlight.getInstance().getCamera() == null)
+                        return;
+
                     Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
-                    Flashlight.getInstance().getCamera().startPreview();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Flashlight.getInstance().getCamera().startPreview();
+                            } catch (Exception e) {
+                                return;
+                            }
+                        }
+                    }).start();
                     isOn = true;
                 }
 
@@ -42,14 +64,32 @@ public class FlashModeHandler {
         }
     };
 
-    public void setMode(int mode) {
+    public void setMode(Activity activity, int mode) {
         handler.removeCallbacks(runnable);
+
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            PermissionUtils.requestPermission(activity, Config.RequestCode.CODE_REQUEST_PERMISSION_CAMERA_IN_SET_MODE, Manifest.permission.CAMERA);
+            return;
+        }
+
         switch (mode) {
             case 0:
                 if (Flashlight.getInstance().isFlashLightOn() == true) {
                     // Turn on flashlight
+                    if(Flashlight.getInstance().getCamera() == null)
+                        return;
+
                     Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
-                    Flashlight.getInstance().getCamera().startPreview();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Flashlight.getInstance().getCamera().startPreview();
+                            } catch (Exception e) {
+                                return;
+                            }
+                        }
+                    }).start();
                     isOn = true;
                 }
                 break;
