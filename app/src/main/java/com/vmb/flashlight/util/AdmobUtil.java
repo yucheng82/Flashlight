@@ -45,11 +45,11 @@ public class AdmobUtil {
         if (context == null)
             return;
 
-        String bannerId = Config.ID_BANNER_ADMOB_UNIT;
+        String bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
             bannerId = Ads.getInstance().getAdmob().getBanner();
             if (TextUtils.isEmpty(bannerId))
-                bannerId = Config.ID_BANNER_ADMOB_UNIT;
+                bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         }
         Log.i(TAG_BANNER, "bannerId = " + bannerId);
 
@@ -139,11 +139,11 @@ public class AdmobUtil {
 
         interstitialAd = new InterstitialAd(activity);
 
-        String popupId = Config.ID_POPUP_ADMOB_UNIT;
+        String popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
             popupId = Ads.getInstance().getAdmob().getPopup();
             if (TextUtils.isEmpty(popupId))
-                popupId = Config.ID_POPUP_ADMOB_UNIT;
+                popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         }
         Log.i(TAG_POPUP, "popupId = " + popupId);
         interstitialAd.setAdUnitId(popupId);

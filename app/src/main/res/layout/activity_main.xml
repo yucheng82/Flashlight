@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:visibility="visible">
@@ -133,4 +132,9 @@
     </LinearLayout>
 
     <include layout="@layout/layout_adview" />
+
+    <include
+        android:id="@+id/layout_dialog"
+        layout="@layout/layout_dialog"
+        android:visibility="gone"/>
 </RelativeLayout>

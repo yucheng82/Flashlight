@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AdListener;
+import com.facebook.ads.AdSettings;
 import com.facebook.ads.AdSize;
 import com.facebook.ads.AdView;
 import com.facebook.ads.InterstitialAd;
@@ -45,11 +46,11 @@ public class FBAdsUtil {
         if (context == null)
             return;
 
-        String bannerId = Config.ID_BANNER_FB_UNIT;
+        String bannerId = Config.AdsID.ID_BANNER_FB_UNIT;
         if (Ads.getInstance().getFacebook() != null) {
             bannerId = Ads.getInstance().getFacebook().getBanner();
             if (TextUtils.isEmpty(bannerId))
-                bannerId = Config.ID_BANNER_FB_UNIT;
+                bannerId = Config.AdsID.ID_BANNER_FB_UNIT;
         }
         Log.i(TAG_BANNER, "bannerId = " + bannerId);
 
@@ -109,6 +110,7 @@ public class FBAdsUtil {
                                         banner.removeAllViews();
                                         banner.addView(adView);
 
+                                        AdSetting.addTestDevice();
                                         loadAdView(adView);
                                     }
                                 }).run();
@@ -141,11 +143,11 @@ public class FBAdsUtil {
         if (activity == null)
             return;
 
-        String popupId = Config.ID_POPUP_FB_UNIT;
+        String popupId = Config.AdsID.ID_POPUP_FB_UNIT;
         if (Ads.getInstance().getFacebook() != null) {
             popupId = Ads.getInstance().getFacebook().getPopup();
             if (TextUtils.isEmpty(popupId))
-                popupId = Config.ID_POPUP_FB_UNIT;
+                popupId = Config.AdsID.ID_POPUP_FB_UNIT;
         }
         Log.i(TAG_POPUP, "popupId = " + popupId);
 
@@ -199,6 +201,7 @@ public class FBAdsUtil {
             }
         });
 
+        AdSetting.addTestDevice();
         loadPopup();
     }
 

@@ -11,4 +11,6 @@
     <string name="loading">Đang tải</string>
     <string name="press_back_again">Ấn back lần nữa để thoát</string>
     <string name="failed_camera">Không thể kết nối đến Flash</string>
+    <string name="rate">Đánh giá</string>
+    <string name="rating">Hãy đánh giá 5* để ủng hộ nhà phát triển nhé</string>
 </resources>

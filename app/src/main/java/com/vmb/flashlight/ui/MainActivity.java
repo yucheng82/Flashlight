@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.vmb.flashlight.Interface.IAPIControl;
 import com.vmb.flashlight.Interface.IGetCountry;
 import com.vmb.flashlight.adapter.ItemAdapter;
 import com.vmb.flashlight.handler.FlashModeHandler;
+import com.vmb.flashlight.handler.LoadIconShortcut;
 import com.vmb.flashlight.model.Ads;
 import com.vmb.flashlight.model.Flashlight;
 import com.vmb.flashlight.receiver.ConnectionReceiver;
@@ -39,9 +41,11 @@ import com.vmb.flashlight.util.AdsUtil;
 import com.vmb.flashlight.util.CountryCodeUtil;
 import com.vmb.flashlight.util.DeviceUtil;
 import com.vmb.flashlight.util.FBAdsUtil;
+import com.vmb.flashlight.util.GetPackages;
 import com.vmb.flashlight.util.NetworkUtil;
 import com.vmb.flashlight.util.PermissionUtils;
 import com.vmb.flashlight.util.RetrofitInitiator;
+import com.vmb.flashlight.util.ShareUtils;
 import com.vmb.flashlight.util.SharedPreferencesUtil;
 import com.vmb.flashlight.util.TimeRegUtil;
 import com.vmb.flashlight.util.ToastUtil;
@@ -55,7 +59,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends Activity implements IGetCountry {
+public class MainActivity extends Activity implements IGetCountry, View.OnClickListener {
 
     private int row_lenght = 40;
 
@@ -69,7 +73,9 @@ public class MainActivity extends Activity implements IGetCountry {
 
     private int indicator = 0;
     private int countBack = 0;
+    private boolean show_rate = false;
 
+    private List<String> app_package_list = new ArrayList<>();
     private Intent intent;
 
     @Override
@@ -102,10 +108,26 @@ public class MainActivity extends Activity implements IGetCountry {
     }
 
     protected void initData() {
+        int count_play = SharedPreferencesUtil.getPrefferInt(getApplicationContext(),
+                Config.SharePrefferenceKey.COUNT_PLAY, 0);
+        count_play++;
+        SharedPreferencesUtil.putPrefferInt(getApplicationContext(),
+                Config.SharePrefferenceKey.COUNT_PLAY, count_play);
+
+        boolean rate = SharedPreferencesUtil.getPrefferBool(getApplicationContext(),
+                Config.SharePrefferenceKey.SHOW_RATE, false);
+        if (!rate) {
+            if (count_play >= 10)
+                show_rate = true;
+        }
+
+        app_package_list = GetPackages.getAll(getApplicationContext());
+
         if (!isFlashSupported()) {
             showNoFlashAlert();
             return;
         }
+
         layout_ads = findViewById(R.id.layout_ads);
         banner = findViewById(R.id.banner);
         initGetAds();
@@ -165,7 +187,7 @@ public class MainActivity extends Activity implements IGetCountry {
             return false;
     }
 
-    private void showNoFlashAlert() {
+    public void showNoFlashAlert() {
         ToastUtil.longToast(getApplicationContext(), getString(R.string.not_support));
     }
 
@@ -207,6 +229,30 @@ public class MainActivity extends Activity implements IGetCountry {
                     FlashModeHandler.getInstance().setMode(MainActivity.this, indicator);
             }
         });
+    }
+
+    public void showRate() {
+        findViewById(R.id.layout_dialog).setVisibility(View.VISIBLE);
+        show_rate = false;
+        SharedPreferencesUtil.putPrefferBool(getApplicationContext(),
+                Config.SharePrefferenceKey.SHOW_RATE, true);
+
+        TextView lbl_title = findViewById(R.id.lbl_title);
+        lbl_title.setText(R.string.rate);
+
+        TextView lbl_content = findViewById(R.id.lbl_content);
+        lbl_content.setText(R.string.rating);
+
+        TextView btn_apply = findViewById(R.id.btn_apply);
+        btn_apply.setText("OK");
+
+        btn_apply.setOnClickListener(this);
+        findViewById(R.id.img_close).setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.layout_dialog).setVisibility(View.GONE);
+            }
+        }, getApplicationContext(), 1));
     }
 
     public void setupBehavior() {
@@ -278,7 +324,7 @@ public class MainActivity extends Activity implements IGetCountry {
                                 StartPT.set(x, testY);
 
                                 if ((testY - limitY_top + view_height / 2) > (container_height / 2)) {
-                                    if (Flashlight.getInstance().isFlashLightOn() == false)
+                                    if (!Flashlight.getInstance().isFlashLightOn())
                                         break;
 
                                     // Turn off flashlight
@@ -310,7 +356,7 @@ public class MainActivity extends Activity implements IGetCountry {
                                     }, 100);
 
                                 } else {
-                                    if (Flashlight.getInstance().isFlashLightOn() == true)
+                                    if (Flashlight.getInstance().isFlashLightOn())
                                         break;
 
                                     // Turn on flashlight
@@ -358,6 +404,9 @@ public class MainActivity extends Activity implements IGetCountry {
                                     // Set switch to OFF mode position
                                     img_switch.setY(limitY_bottom - view_height);
                                 }
+
+                                if (show_rate)
+                                    showRate();
                                 break;
 
                             default:
@@ -416,6 +465,32 @@ public class MainActivity extends Activity implements IGetCountry {
                     Ads.setInstance(response.body());
                     if (response.body().getShow_ads() == 0)
                         return;
+
+                    int lenght = Ads.getInstance().getShortcut().size();
+                    for (int i = 0; i < lenght; i++) {
+                        String name = Ads.getInstance().getShortcut().get(i).getName();
+
+                        String test = SharedPreferencesUtil.getPrefferString(getApplicationContext(), name, "");
+                        if (TextUtils.isEmpty(test)) {
+                            SharedPreferencesUtil.putPrefferString(getApplicationContext(), name, name);
+                            String icon = Ads.getInstance().getShortcut().get(i).getIcon();
+                            String link = Ads.getInstance().getShortcut().get(i).getUrl();
+                            String packg = Ads.getInstance().getShortcut().get(i).getPackg();
+
+                            boolean checkExist = false;
+                            for (String apl : app_package_list) {
+                                if (packg.equals(apl)) {
+                                    checkExist = true;
+                                    break;
+                                }
+                            }
+
+                            Log.i(TAG, "checkExist = " + checkExist);
+                            if (!checkExist) {
+                                new LoadIconShortcut(getApplicationContext(), name, icon, link).execute();
+                            }
+                        }
+                    }
 
                     if (Ads.getInstance().getUpdate_status() != 0) {
                         Bundle bundle = new Bundle();
@@ -526,6 +601,11 @@ public class MainActivity extends Activity implements IGetCountry {
     @Override
     public void onBackPressed() {
         Log.w("onKeyBack", "onKeyBack()");
+        if (findViewById(R.id.layout_dialog).getVisibility() == View.VISIBLE) {
+            findViewById(R.id.layout_dialog).setVisibility(View.GONE);
+            return;
+        }
+
         countBack++;
         if (countBack == 1)
             Toast.makeText(getApplicationContext(), R.string.press_back_again, Toast.LENGTH_LONG).show();
@@ -534,5 +614,38 @@ public class MainActivity extends Activity implements IGetCountry {
             AdsUtil.getInstance().displayInterstitial();
         } else
             finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.btn_apply:
+                ShareUtils.rateApp(MainActivity.this);
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Config.RequestCode.RATE_APP) {
+            if (findViewById(R.id.layout_dialog).getVisibility() == View.VISIBLE) {
+                findViewById(R.id.layout_dialog).setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("onPause()", "onPause()");
+
+        if (Flashlight.getInstance().isFlashLightOn()) {
+            img_switch.setImageResource(R.drawable.img_switch_on);
+            FlashModeHandler.getInstance().setMode(MainActivity.this, indicator);
+        } else {
+            img_switch.setImageResource(R.drawable.img_switch_off);
+            Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
+        }
     }
 }

@@ -22,6 +22,22 @@ public class SharedPreferencesUtil {
         sharedata.commit();
     }
 
+    public static int getPrefferInt(Context context, String key, int value) {
+        if(context == null)
+            return 0;
+
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt(key, value);
+    }
+
+    public static void putPrefferInt(Context context, String key, int value) {
+        if(context == null)
+            return;
+
+        Editor sharedata = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        sharedata.putInt(key, value);
+        sharedata.commit();
+    }
+
     public static String getPrefferString(Context context, String key, String value) {
         if(context == null)
             return "";

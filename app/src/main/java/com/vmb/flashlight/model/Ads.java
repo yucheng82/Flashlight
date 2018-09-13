@@ -1,5 +1,8 @@
 package com.vmb.flashlight.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Ads {
 
     private static Ads ads;
@@ -115,5 +118,34 @@ public class Ads {
 
     public String getUpdate_url() {
         return update_url;
+    }
+
+    private List<shortcut> shortcut = new ArrayList<>();
+
+    public List<Ads.shortcut> getShortcut() {
+        return shortcut;
+    }
+
+    public static class shortcut {
+        private String name = "Flashlight";
+        private String icon = "https://lh3.googleusercontent.com/CxwmPbQ1e8FxPvkRFoq0McHCoDUIeRnR8L_iQzkFZscDcXKdk9eaeX1k8HGgjZ883I4=s360";
+        private String url = "https://play.google.com/store/apps/details?id=flashlight.supper.flashlight";
+        private String packg = "flashlight.supper.flashlight";
+
+        public String getName() {
+            return name;
+        }
+
+        public String getIcon() {
+            return icon;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public String getPackg() {
+            return packg;
+        }
     }
 }
