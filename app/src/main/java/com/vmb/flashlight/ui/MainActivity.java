@@ -381,35 +381,35 @@ public class MainActivity extends Activity implements IGetCountry {
     public void onGetCountry(final String country) {
         final String TAG = "onGetCountry";
         if (isFinishing()) {
-            Log.d(TAG, "activity.isFinishing()");
+            Log.i(TAG, "activity.isFinishing()");
             return;
         }
 
         final String deviceID = DeviceUtil.getDeviceId(getApplicationContext());
-        Log.d(TAG, "deviceID = " + deviceID);
+        Log.i(TAG, "deviceID = " + deviceID);
         final String code = Config.CODE_CONTROL_APP;
-        Log.d(TAG, "code = " + code);
+        Log.i(TAG, "code = " + code);
         final String version = Config.VERSION_APP;
-        Log.d(TAG, "version = " + version);
+        Log.i(TAG, "version = " + version);
         final String timereg = TimeRegUtil.getTimeRegister(getApplicationContext());
-        Log.d(TAG, "timereg = " + timereg);
+        Log.i(TAG, "timereg = " + timereg);
         final String packg = Config.PACKAGE_NAME;
-        Log.d(TAG, "packg = " + packg);
+        Log.i(TAG, "packg = " + packg);
 
         IAPIControl api = RetrofitInitiator.createService(IAPIControl.class, Config.Url.URL_BASE);
         Call<Ads> call = api.getAds(deviceID, code, version, country, timereg, packg);
         call.enqueue(new Callback<Ads>() {
             @Override
             public void onResponse(Call<Ads> call, Response<Ads> response) {
-                Log.d(TAG, "onResponse()");
+                Log.i(TAG, "onResponse()");
                 if (response == null)
                     return;
 
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "response.isSuccessful()");
+                    Log.i(TAG, "response.isSuccessful()");
 
                     if (response.body() == null || isFinishing()) {
-                        Log.d(TAG, "response.body() null || activity.isFinishing()");
+                        Log.i(TAG, "response.body() null || activity.isFinishing()");
                         return;
                     }
 
@@ -447,7 +447,7 @@ public class MainActivity extends Activity implements IGetCountry {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (Ads.getInstance().getAds_network().equals("facebook")) {
+                            if (Ads.getInstance().getAds_network().equals("admob")) {
                                 AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
                             } else {
                                 FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
@@ -472,13 +472,13 @@ public class MainActivity extends Activity implements IGetCountry {
                     AdsUtil.getInstance().setInitGetAds(true);
 
                 } else {
-                    Log.d(TAG, "response.failed");
+                    Log.i(TAG, "response.failed");
                 }
             }
 
             @Override
             public void onFailure(Call<Ads> call, Throwable t) {
-                Log.d(TAG, "onFailure()");
+                Log.i(TAG, "onFailure()");
             }
         });
     }

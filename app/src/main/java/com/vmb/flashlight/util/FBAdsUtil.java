@@ -71,7 +71,7 @@ public class FBAdsUtil {
                                         adView.setAdListener(new AdListener() {
                                             @Override
                                             public void onError(Ad ad, AdError adError) {
-                                                Log.d(TAG_BANNER, "onError(): " + adError.getErrorMessage());
+                                                Log.i(TAG_BANNER, "onError(): " + adError.getErrorMessage());
 
                                                 countLoadFailBanner++;
                                                 Log.i(TAG_BANNER, "countLoadFail = " + countLoadFailBanner);
@@ -79,7 +79,7 @@ public class FBAdsUtil {
                                                     loadAdView(adView);
                                                 } else {
                                                     isLoadFailedBanner = true;
-                                                    Log.d(TAG_BANNER, "countLoadFailBanner > 3");
+                                                    Log.i(TAG_BANNER, "countLoadFailBanner > 3");
 
                                                     if (!AdmobUtil.getInstance().isLoadFailedBanner())
                                                         AdmobUtil.getInstance().initBannerAdmob(context, banner, layout_ads);
@@ -91,18 +91,18 @@ public class FBAdsUtil {
                                                 layout_ads.setVisibility(View.VISIBLE);
                                                 banner.setVisibility(View.VISIBLE);
 
-                                                Log.d(TAG_BANNER, "onAdLoaded()");
+                                                Log.i(TAG_BANNER, "onAdLoaded()");
                                             }
 
                                             @Override
                                             public void onAdClicked(Ad ad) {
-                                                Log.d(TAG_BANNER, "onAdClicked()");
+                                                Log.i(TAG_BANNER, "onAdClicked()");
                                                 layout_ads.setVisibility(View.GONE);
                                             }
 
                                             @Override
                                             public void onLoggingImpression(Ad ad) {
-                                                Log.d(TAG_BANNER, "onLoggingImpression()");
+                                                Log.i(TAG_BANNER, "onLoggingImpression()");
                                             }
                                         });
 
@@ -153,12 +153,12 @@ public class FBAdsUtil {
         interstitialAd.setAdListener(new InterstitialAdListener() {
             @Override
             public void onInterstitialDisplayed(Ad ad) {
-                Log.d(TAG_POPUP, "onInterstitialDisplayed()");
+                Log.i(TAG_POPUP, "onInterstitialDisplayed()");
             }
 
             @Override
             public void onInterstitialDismissed(Ad ad) {
-                Log.d(TAG_POPUP, "onInterstitialDismissed()");
+                Log.i(TAG_POPUP, "onInterstitialDismissed()");
 
                 if (AdsUtil.getInstance().isShowPopupCloseApp()) {
                     activity.finish();
@@ -171,30 +171,30 @@ public class FBAdsUtil {
 
             @Override
             public void onAdLoaded(Ad ad) {
-                Log.d(TAG_POPUP, "onAdLoaded()");
+                Log.i(TAG_POPUP, "onAdLoaded()");
             }
 
             @Override
             public void onAdClicked(Ad ad) {
                 // Ad clicked callback
-                Log.d(TAG_POPUP, "onAdClicked()");
+                Log.i(TAG_POPUP, "onAdClicked()");
             }
 
             @Override
             public void onLoggingImpression(Ad ad) {
-                Log.d(TAG_POPUP, "onLoggingImpression()");
+                Log.i(TAG_POPUP, "onLoggingImpression()");
             }
 
             @Override
             public void onError(Ad ad, AdError adError) {
-                Log.d(TAG_POPUP, "onError(): " + adError.getErrorMessage());
+                Log.i(TAG_POPUP, "onError(): " + adError.getErrorMessage());
 
                 countLoadFailPopup++;
                 Log.i(TAG_POPUP, "countLoadFail = " + countLoadFailPopup);
                 if (countLoadFailPopup <= 3) {
                     loadPopup();
                 } else {
-                    Log.d(TAG_POPUP, "countLoadFailPopup > 3");
+                    Log.i(TAG_POPUP, "countLoadFailPopup > 3");
                 }
             }
         });
@@ -220,32 +220,32 @@ public class FBAdsUtil {
     public void displayInterstitial() {
         String TAG = "displayFB";
         if (interstitialAd == null) {
-            Log.d(TAG, "interstitialAd == null");
+            Log.i(TAG, "interstitialAd == null");
             return;
         }
 
         if (AdsUtil.getInstance().isShowPopupCloseApp()) {
             if (interstitialAd.isAdLoaded()) {
                 interstitialAd.show();
-                Log.d(TAG, "displayCloseApp()");
+                Log.i(TAG, "displayCloseApp()");
             } else {
-                Log.d(TAG, "interstitialAd.loadFailed()");
+                Log.i(TAG, "interstitialAd.loadFailed()");
                 if (AdmobUtil.getInstance().getInterstitialAd() == null) {
-                    Log.d(TAG, "Admob Interstitial == null");
+                    Log.i(TAG, "Admob Interstitial == null");
                     return;
                 }
 
                 if (AdmobUtil.getInstance().getInterstitialAd().isLoaded())
                     AdmobUtil.getInstance().displayInterstitial();
                 else
-                    Log.d(TAG, "Admob Interstitial load failed");
+                    Log.i(TAG, "Admob Interstitial load failed");
             }
             return;
         }
 
-        Log.d(TAG, "displayInterstitial() = true");
+        Log.i(TAG, "displayInterstitial() = true");
         boolean firstShow = AdsUtil.getInstance().isShowPopupFirstTime();
-        Log.d(TAG, "firstShow = " + firstShow);
+        Log.i(TAG, "firstShow = " + firstShow);
 
         if (!firstShow) {
             Calendar timeStart = AdsUtil.getInstance().getTimeStart();
@@ -267,24 +267,24 @@ public class FBAdsUtil {
                 interstitialAd.show();
                 AdsUtil.getInstance().restartCountDown();
                 AdsUtil.getInstance().setShowPopupFirstTime(true);
-                Log.d(TAG, "displayInterstitial()");
+                Log.i(TAG, "displayInterstitial()");
             } else {
-                Log.d(TAG, "interstitialAd.loadFailed()");
+                Log.i(TAG, "interstitialAd.loadFailed()");
                 if (AdmobUtil.getInstance().getInterstitialAd() == null) {
-                    Log.d(TAG, "Admob Interstitial == null");
+                    Log.i(TAG, "Admob Interstitial == null");
                     return;
                 }
 
                 if (AdmobUtil.getInstance().getInterstitialAd().isLoaded())
                     AdmobUtil.getInstance().displayInterstitial();
                 else
-                    Log.d(TAG, "Admob Interstitial load failed");
+                    Log.i(TAG, "Admob Interstitial load failed");
             }
             return;
         }
 
         boolean check = AdsUtil.getInstance().isCanShowPopup();
-        Log.d(TAG, "check = " + check);
+        Log.i(TAG, "check = " + check);
 
         if (!check)
             return;
@@ -292,18 +292,18 @@ public class FBAdsUtil {
         if (interstitialAd.isAdLoaded()) {
             interstitialAd.show();
             AdsUtil.getInstance().restartCountDown();
-            Log.d(TAG, "displayInterstitial() = true");
+            Log.i(TAG, "displayInterstitial() = true");
         } else {
-            Log.d(TAG, "interstitialAd.loadFailed()");
+            Log.i(TAG, "interstitialAd.loadFailed()");
             if (AdmobUtil.getInstance().getInterstitialAd() == null) {
-                Log.d(TAG, "Admob Interstitial == null");
+                Log.i(TAG, "Admob Interstitial == null");
                 return;
             }
 
             if (AdmobUtil.getInstance().getInterstitialAd().isLoaded())
                 AdmobUtil.getInstance().displayInterstitial();
             else
-                Log.d(TAG, "Admob Interstitial load failed");
+                Log.i(TAG, "Admob Interstitial load failed");
         }
     }
 

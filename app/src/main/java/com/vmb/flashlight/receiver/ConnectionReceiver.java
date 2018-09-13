@@ -43,7 +43,7 @@ public class ConnectionReceiver extends BroadcastReceiver {
             Activity activity = ConnectionReceiver.getInstance().getActivity();
 
             if (activity == null) {
-                Log.d(TAG, "activity null");
+                Log.i(TAG, "activity null");
                 return;
             }
 

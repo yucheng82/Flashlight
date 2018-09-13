@@ -45,6 +45,9 @@ public class Flashlight {
             return;
 
         MediaPlayer mp = MediaPlayer.create(context, R.raw.sound_toggle);
+        if(mp == null)
+            return;
+
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {

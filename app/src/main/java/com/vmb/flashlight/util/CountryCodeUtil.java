@@ -47,7 +47,7 @@ public class CountryCodeUtil {
                         country = words[1];
                 }
 
-                Log.d(TAG, "country = " + country);
+                Log.i(TAG, "country = " + country);
                 iGetCountry.onGetCountry(country);
 
                 } catch (Exception e) {

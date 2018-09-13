@@ -75,7 +75,7 @@ public class AdsUtil {
         String TAG = "initCountDown";
 
         if (Ads.getInstance() == null || Ads.getInstance().getConfig() == null) {
-            Log.d(TAG, "Ads.getInstance() null || Ads.getInstance().getConfig() null");
+            Log.i(TAG, "Ads.getInstance() null || Ads.getInstance().getConfig() null");
             return;
         }
 
