@@ -289,6 +289,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                                 int testY = (int) (StartPT.y + event.getY() - DownPT.y);
 
                                 if (testY < limitY_top) {
+                                    Flashlight.getInstance().setFlashLightOn(true);
                                     img_switch.setY(limitY_top);
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
@@ -305,6 +306,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                                 }
 
                                 if (testY + view_height > limitY_bottom) {
+                                    Flashlight.getInstance().setFlashLightOn(false);
                                     img_switch.setY(limitY_bottom - view_height);
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
