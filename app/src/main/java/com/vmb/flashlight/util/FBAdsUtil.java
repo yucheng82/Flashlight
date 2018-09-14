@@ -2,7 +2,6 @@ package com.vmb.flashlight.util;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.widget.RelativeLayout;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AdListener;
-import com.facebook.ads.AdSettings;
 import com.facebook.ads.AdSize;
 import com.facebook.ads.AdView;
 import com.facebook.ads.InterstitialAd;
@@ -54,87 +52,54 @@ public class FBAdsUtil {
         }
         Log.i(TAG_BANNER, "bannerId = " + bannerId);
 
-        final String finalBannerId = bannerId;
-        new Handler().postDelayed(new Runnable() {
+        final AdView adView = new AdView(context, bannerId, AdSize.BANNER_HEIGHT_50);
+        adView.setAdListener(new AdListener() {
             @Override
-            public void run() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final AdView adView = new AdView(context, finalBannerId, AdSize.BANNER_HEIGHT_50);
+            public void onError(Ad ad, AdError adError) {
+                Log.i(TAG_BANNER, "onError(): " + adError.getErrorMessage());
 
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        adView.setAdListener(new AdListener() {
-                                            @Override
-                                            public void onError(Ad ad, AdError adError) {
-                                                Log.i(TAG_BANNER, "onError(): " + adError.getErrorMessage());
+                countLoadFailBanner++;
+                Log.i(TAG_BANNER, "countLoadFail = " + countLoadFailBanner);
+                if (countLoadFailBanner <= 3) {
+                    loadAdView(adView);
+                } else {
+                    isLoadFailedBanner = true;
+                    Log.i(TAG_BANNER, "countLoadFailBanner > 3");
 
-                                                countLoadFailBanner++;
-                                                Log.i(TAG_BANNER, "countLoadFail = " + countLoadFailBanner);
-                                                if (countLoadFailBanner <= 3) {
-                                                    loadAdView(adView);
-                                                } else {
-                                                    isLoadFailedBanner = true;
-                                                    Log.i(TAG_BANNER, "countLoadFailBanner > 3");
-
-                                                    if (!AdmobUtil.getInstance().isLoadFailedBanner())
-                                                        AdmobUtil.getInstance().initBannerAdmob(context, banner, layout_ads);
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onAdLoaded(Ad ad) {
-                                                layout_ads.setVisibility(View.VISIBLE);
-                                                banner.setVisibility(View.VISIBLE);
-
-                                                Log.i(TAG_BANNER, "onAdLoaded()");
-                                            }
-
-                                            @Override
-                                            public void onAdClicked(Ad ad) {
-                                                Log.i(TAG_BANNER, "onAdClicked()");
-                                                layout_ads.setVisibility(View.GONE);
-                                            }
-
-                                            @Override
-                                            public void onLoggingImpression(Ad ad) {
-                                                Log.i(TAG_BANNER, "onLoggingImpression()");
-                                            }
-                                        });
-
-                                        banner.removeAllViews();
-                                        banner.addView(adView);
-
-                                        AdSetting.addTestDevice();
-                                        loadAdView(adView);
-                                    }
-                                }).run();
-                            }
-                        }, 1000);
-                    }
-                }).run();
+                    if (!AdmobUtil.getInstance().isLoadFailedBanner())
+                        AdmobUtil.getInstance().initBannerAdmob(context, banner, layout_ads);
+                }
             }
-        }, 500);
+
+            @Override
+            public void onAdLoaded(Ad ad) {
+                layout_ads.setVisibility(View.VISIBLE);
+                banner.setVisibility(View.VISIBLE);
+
+                Log.i(TAG_BANNER, "onAdLoaded()");
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                Log.i(TAG_BANNER, "onAdClicked()");
+                layout_ads.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onLoggingImpression(Ad ad) {
+                Log.i(TAG_BANNER, "onLoggingImpression()");
+            }
+        });
+
+        banner.removeAllViews();
+        banner.addView(adView);
+
+        AdSetting.addTestDevice();
+        loadAdView(adView);
     }
 
     public void loadAdView(final AdView adView) {
-        // load banner ads
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adView.loadAd();
-                    }
-                }).run();
-            }
-        }, 1000);
+        adView.loadAd();
     }
 
     public void initInterstitialFB(final Activity activity) {
@@ -206,18 +171,8 @@ public class FBAdsUtil {
     }
 
     public void loadPopup() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // load interstitial ads
-                        interstitialAd.loadAd();
-                    }
-                }).run();
-            }
-        }, 1000);
+        // load interstitial ads
+        interstitialAd.loadAd();
     }
 
     public void displayInterstitial() {

@@ -17,7 +17,7 @@ public class MainApplication extends Application {
         Fabric.with(this, new Crashlytics());
         TimeRegUtil.setTimeRegister(getApplicationContext());
 
-        QuangCaoSetup.setConfig(getApplicationContext(), Config.CODE_CONTROL_APP, "1.0");
+        QuangCaoSetup.setConfig(getApplicationContext(), Config.CODE_CONTROL_APP, Config.VERSION_APP);
         QuangCaoSetup.setLinkServer(getApplicationContext(), Config.Url.URL_LINK_SERVER);
     }
 }

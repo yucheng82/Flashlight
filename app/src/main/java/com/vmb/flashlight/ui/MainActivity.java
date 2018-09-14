@@ -521,30 +521,14 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
 
                     AdsUtil.getInstance().initCountDown();
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (Ads.getInstance().getAds_network().equals("admob")) {
-                                AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
-                            } else {
-                                FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
-                            }
-                        }
-                    }, 1000);
+                    if (Ads.getInstance().getAds_network().equals("admob")) {
+                        AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
+                    } else {
+                        FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
+                    }
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
-                        }
-                    }, 5000);
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
-                        }
-                    }, 7000);
+                    FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
+                    AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
 
                     AdsUtil.getInstance().setInitGetAds(true);
 
@@ -589,11 +573,13 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
 
     @Override
     protected void onDestroy() {
-        /*if (Flashlight.getInstance().getCamera() != null) {
-            Flashlight.getInstance().getCamera().stopPreview();
-            Flashlight.getInstance().getCamera().release();
-            Flashlight.getInstance().setInstance(null);
-        }*/
+        if (!Flashlight.getInstance().isFlashLightOn()) {
+            if (Flashlight.getInstance().getCamera() != null) {
+                Flashlight.getInstance().getCamera().stopPreview();
+                Flashlight.getInstance().getCamera().release();
+                Flashlight.getInstance().setInstance(null);
+            }
+        }
 
         AdsUtil.getInstance().cancelDownCount();
         AdsUtil.getInstance().setInstance(null);

@@ -2,7 +2,6 @@ package com.vmb.flashlight.util;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -118,17 +117,7 @@ public class AdmobUtil {
     public void loadAdView(final AdView adView) {
         // load banner ads
         final AdRequest adRequest = new AdRequest.Builder().build();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adView.loadAd(adRequest);
-                    }
-                }).run();
-            }
-        }, 1000);
+        adView.loadAd(adRequest);
     }
 
     public void initInterstitialAdmob(final Activity activity) {
@@ -200,20 +189,10 @@ public class AdmobUtil {
     }
 
     public void loadPopup() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Create ad request.
-                        AdRequest adRequestFull = new AdRequest.Builder().build();
-                        // Begin loading your interstitial.
-                        interstitialAd.loadAd(adRequestFull);
-                    }
-                }).run();
-            }
-        }, 1000);
+        // Create ad request.
+        AdRequest adRequestFull = new AdRequest.Builder().build();
+        // Begin loading your interstitial.
+        interstitialAd.loadAd(adRequestFull);
     }
 
     public void displayInterstitial() {
