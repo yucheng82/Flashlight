@@ -13,4 +13,5 @@
     <string name="failed_camera">Không thể kết nối đến Flash</string>
     <string name="rate">Đánh giá</string>
     <string name="rating">Hãy đánh giá 5* để ủng hộ nhà phát triển nhé</string>
+    <string name="not_support_compass">Thiết bị của bạn không hỗ trợ la bàn</string>
 </resources>

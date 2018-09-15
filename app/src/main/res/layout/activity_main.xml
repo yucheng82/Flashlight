@@ -134,6 +134,7 @@
                     android:background="@drawable/compass_background">
 
                     <ImageView
+                        android:id="@+id/img_compass"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/compass" />

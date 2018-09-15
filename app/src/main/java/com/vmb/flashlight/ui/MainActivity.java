@@ -7,9 +7,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +23,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -59,7 +64,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends Activity implements IGetCountry, View.OnClickListener {
+public class MainActivity extends Activity implements IGetCountry, View.OnClickListener, SensorEventListener {
 
     private int row_lenght = 40;
 
@@ -68,6 +73,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
 
     private ImageView img_switch;
     private ImageView img_setting;
+    private ImageView img_compass;
     private FrameLayout container;
     private TextView lbl_indicator_light;
 
@@ -77,6 +83,12 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
 
     private List<String> app_package_list = new ArrayList<>();
     private Intent intent;
+
+    // record the compass picture angle turned
+    private float currentDegree = 0f;
+
+    // device sensor manager
+    private SensorManager mSensorManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,11 +115,15 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     protected void initView() {
         img_switch = findViewById(R.id.imb_switch);
         img_setting = findViewById(R.id.img_setting);
+        img_compass = findViewById(R.id.img_compass);
         container = findViewById(R.id.container);
         lbl_indicator_light = findViewById(R.id.lbl_indicator_light);
     }
 
     protected void initData() {
+        // initialize your android device sensor capabilities
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
         int count_play = SharedPreferencesUtil.getPrefferInt(getApplicationContext(),
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
         count_play++;
@@ -429,6 +445,40 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     }
 
     @Override
+    public void onSensorChanged(SensorEvent event) {
+        // get the angle around the z-axis rotated
+        float degree = Math.round(event.values[0]);
+
+        // create a rotation animation (reverse turn degree degrees)
+        RotateAnimation ra = new RotateAnimation(
+                currentDegree,
+                -degree,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f);
+
+        // how long the animation will take place
+        ra.setDuration(210);
+
+        // set the animation after the end of the reservation status
+        ra.setFillAfter(true);
+
+        currentDegree = -degree;
+
+        if (img_compass != null) {
+            // Start the animation
+            img_compass.startAnimation(ra);
+        }
+
+        Log.i("onSensorChanged", "onSensorChanged");
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // not in use
+    }
+
+    @Override
     public void onGetCountry(final String country) {
         final String TAG = "onGetCountry";
         if (isFinishing()) {
@@ -583,6 +633,10 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
 
         AdsUtil.getInstance().cancelDownCount();
         AdsUtil.getInstance().setInstance(null);
+
+        // to stop the listener and save battery
+        if (mSensorManager != null)
+            mSensorManager.unregisterListener(this);
         super.onDestroy();
     }
 
@@ -635,5 +689,21 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
             img_switch.setImageResource(R.drawable.img_switch_off);
             Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
         }
+
+        // to stop the listener and save battery
+        if (mSensorManager != null)
+            mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // for the system's orientation sensor registered listeners
+        if (mSensorManager != null)
+            mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                    SensorManager.SENSOR_DELAY_GAME);
+        else
+            ToastUtil.longToast(getApplicationContext(), getString(R.string.not_support_compass));
     }
 }

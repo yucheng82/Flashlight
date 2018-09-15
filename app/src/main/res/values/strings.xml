@@ -13,4 +13,5 @@
     <string name="failed_camera">Failed to connect to Camera Service</string>
     <string name="rate">Rate</string>
     <string name="rating">Please rate 5* to support the developer</string>
+    <string name="not_support_compass">Your device does not support compass</string>
 </resources>
