@@ -14,6 +14,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.vmb.flashlight.Config;
+import com.vmb.flashlight.adapter.holder.TimeMapper;
 import com.vmb.flashlight.model.Ads;
 
 import java.util.Calendar;
@@ -46,7 +47,7 @@ public class AdmobUtil {
 
         String bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
-            bannerId = Ads.getInstance().getAdmob().getBanner();
+            bannerId = TimeMapper.mapp1(context);
             if (TextUtils.isEmpty(bannerId))
                 bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         }
@@ -130,7 +131,7 @@ public class AdmobUtil {
 
         String popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
-            popupId = Ads.getInstance().getAdmob().getPopup();
+            popupId = TimeMapper.mapp2(activity);
             if (TextUtils.isEmpty(popupId))
                 popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         }

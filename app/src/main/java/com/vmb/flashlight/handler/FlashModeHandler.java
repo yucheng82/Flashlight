@@ -2,7 +2,6 @@ package com.vmb.flashlight.handler;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Handler;
@@ -11,9 +10,6 @@ import android.support.v4.content.ContextCompat;
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.model.Flashlight;
 import com.vmb.flashlight.util.PermissionUtils;
-import com.vmb.flashlight.util.ToastUtil;
-
-import flashlight.supper.flashlight.R;
 
 public class FlashModeHandler {
 
