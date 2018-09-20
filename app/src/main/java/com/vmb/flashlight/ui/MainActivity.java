@@ -25,12 +25,15 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
 import com.noname.quangcaoads.QuangCaoSetup;
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.Interface.IAPIControl;
@@ -66,6 +69,8 @@ import retrofit2.Response;
 
 public class MainActivity extends Activity implements IGetCountry, View.OnClickListener, SensorEventListener {
 
+    public static CallbackManager callbackManager;
+
     private int row_lenght = 40;
 
     private FrameLayout layout_ads;
@@ -74,7 +79,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     private ImageView img_switch;
     private ImageView img_setting;
     private ImageView img_compass;
-    private FrameLayout container;
+    private LinearLayout container;
     private TextView lbl_indicator_light;
 
     private int indicator = 0;
@@ -133,7 +138,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
         boolean rate = SharedPreferencesUtil.getPrefferBool(getApplicationContext(),
                 Config.SharePrefferenceKey.SHOW_RATE, false);
         if (!rate) {
-            if (count_play >= 10)
+            if (count_play >= 5)
                 show_rate = true;
         }
 
@@ -191,8 +196,10 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     }
 
     public void initGetAds() {
-        if (NetworkUtil.isNetworkAvailable(getApplicationContext()))
+        if (NetworkUtil.isNetworkAvailable(getApplicationContext())) {
+            callbackManager = CallbackManager.Factory.create();
             CountryCodeUtil.getCountryCode(this);
+        }
     }
 
     private boolean isFlashSupported() {
@@ -254,15 +261,21 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                 Config.SharePrefferenceKey.SHOW_RATE, true);
 
         TextView lbl_title = findViewById(R.id.lbl_title);
-        lbl_title.setText(R.string.rate);
+        lbl_title.setText(R.string.rate_title);
 
         TextView lbl_content = findViewById(R.id.lbl_content);
-        lbl_content.setText(R.string.rating);
+        lbl_content.setText(R.string.rate_content);
 
-        TextView btn_apply = findViewById(R.id.btn_apply);
-        btn_apply.setText("OK");
+        findViewById(R.id.btn_apply).setVisibility(View.GONE);
 
-        btn_apply.setOnClickListener(this);
+        Button btn_share = findViewById(R.id.btn_share);
+        btn_share.setVisibility(View.VISIBLE);
+        btn_share.setOnClickListener(this);
+
+        Button btn_rate = findViewById(R.id.btn_rate);
+        btn_rate.setVisibility(View.VISIBLE);
+        btn_rate.setOnClickListener(this);
+
         findViewById(R.id.img_close).setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,9 +317,41 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                             case MotionEvent.ACTION_MOVE:
                                 int testY = (int) (StartPT.y + event.getY() - DownPT.y);
 
-                                if (testY < limitY_top) {
-                                    Flashlight.getInstance().setFlashLightOn(true);
+                                if (testY <= limitY_top) {
+                                    // Set switch to ON mode position
                                     img_switch.setY(limitY_top);
+
+                                    if (Flashlight.getInstance().isFlashLightOn())
+                                        break;
+
+                                    // Turn on flashlight
+                                    Flashlight.getInstance().setFlashLightOn(true);
+                                    FlashModeHandler.getInstance().setMode(MainActivity.this, indicator);
+
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    img_switch.setImageResource(R.drawable.img_switch_on);
+                                                }
+                                            }).run();
+                                        }
+                                    }, 50);
+
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Flashlight.getInstance().playToggleSound(getApplicationContext());
+                                                }
+                                            }).run();
+                                        }
+                                    }, 100);
+
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
@@ -321,27 +366,10 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                                     break;
                                 }
 
-                                if (testY + view_height > limitY_bottom) {
-                                    Flashlight.getInstance().setFlashLightOn(false);
+                                if (testY + view_height >= limitY_bottom) {
+                                    // Set switch to OFF mode position
                                     img_switch.setY(limitY_bottom - view_height);
-                                    new android.os.Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            new Thread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    AdsUtil.getInstance().displayInterstitial();
-                                                }
-                                            }).run();
-                                        }
-                                    }, 1000);
-                                    break;
-                                }
 
-                                img_switch.setY(testY);
-                                StartPT.set(x, testY);
-
-                                if ((testY - limitY_top + view_height / 2) > (container_height / 2)) {
                                     if (!Flashlight.getInstance().isFlashLightOn())
                                         break;
 
@@ -373,7 +401,37 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                                         }
                                     }, 100);
 
-                                } else {
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    AdsUtil.getInstance().displayInterstitial();
+                                                }
+                                            }).run();
+                                        }
+                                    }, 1000);
+                                    break;
+                                }
+
+                                img_switch.setY(testY);
+                                StartPT.set(x, testY);
+                                break;
+
+                            case MotionEvent.ACTION_DOWN:
+                                DownPT.set(event.getX(), event.getY());
+                                StartPT.set(img_switch.getX(), img_switch.getY());
+                                break;
+
+                            case MotionEvent.ACTION_UP:
+                                if (show_rate)
+                                    showRate();
+                                int Y = (int) img_switch.getY();
+                                if ((Y - limitY_top + view_height / 2) <= (container_height / 2)) {
+                                    // Set switch to ON mode position
+                                    img_switch.setY(limitY_top);
+
                                     if (Flashlight.getInstance().isFlashLightOn())
                                         break;
 
@@ -404,27 +462,42 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                                             }).run();
                                         }
                                     }, 100);
-                                }
-                                break;
-
-                            case MotionEvent.ACTION_DOWN:
-                                DownPT.set(event.getX(), event.getY());
-                                StartPT.set(img_switch.getX(), img_switch.getY());
-                                break;
-
-                            case MotionEvent.ACTION_UP:
-                                int Y = (int) img_switch.getY();
-                                if ((Y - limitY_top + view_height / 2) <= (container_height / 2)) {
-                                    // Set switch to ON mode position
-                                    img_switch.setY(limitY_top);
 
                                 } else {
                                     // Set switch to OFF mode position
                                     img_switch.setY(limitY_bottom - view_height);
-                                }
 
-                                if (show_rate)
-                                    showRate();
+                                    if (!Flashlight.getInstance().isFlashLightOn())
+                                        break;
+
+                                    // Turn off flashlight
+                                    Flashlight.getInstance().setFlashLightOn(false);
+                                    Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
+
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    img_switch.setImageResource(R.drawable.img_switch_off);
+                                                }
+                                            }).run();
+                                        }
+                                    }, 50);
+
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Flashlight.getInstance().playToggleSound(getApplicationContext());
+                                                }
+                                            }).run();
+                                        }
+                                    }, 100);
+                                }
                                 break;
 
                             default:
@@ -470,7 +543,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
             img_compass.startAnimation(ra);
         }
 
-        Log.i("onSensorChanged", "onSensorChanged");
+        Log.i("onSensorChanged", "currentDegree = " + currentDegree);
     }
 
     @Override
@@ -553,7 +626,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                         bundle.putString("update_url", Ads.getInstance().getUpdate_url());
 
                         if (Ads.getInstance().getUpdate_status() == 1) {
-                            intent = new Intent(MainActivity.this, SplashActivity.class);
+                            intent = new Intent(MainActivity.this, StagingActivity.class);
                             intent.putExtras(bundle);
                         } else if (Ads.getInstance().getUpdate_status() == 2) {
                             intent = new Intent(MainActivity.this, RequireActivity.class);
@@ -662,17 +735,31 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
-            case R.id.btn_apply:
+            case R.id.btn_rate:
+                if (!NetworkUtil.isNetworkAvailable(getApplicationContext())) {
+                    ToastUtil.shortToast(getApplicationContext(), getString(R.string.no_internet));
+                    return;
+                }
                 ShareUtils.rateApp(MainActivity.this);
+                break;
+
+            case R.id.btn_share:
+                if (!NetworkUtil.isNetworkAvailable(getApplicationContext())) {
+                    ToastUtil.shortToast(getApplicationContext(), getString(R.string.no_internet));
+                    return;
+                }
+                ShareUtils.shareFB(MainActivity.this);
                 break;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Config.RequestCode.RATE_APP) {
-            if (findViewById(R.id.layout_dialog).getVisibility() == View.VISIBLE) {
-                findViewById(R.id.layout_dialog).setVisibility(View.GONE);
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Config.RequestCode.SHARE_FB) {
+            if (callbackManager != null) {
+                callbackManager.onActivityResult(requestCode, resultCode, data);
             }
         }
     }
@@ -682,14 +769,6 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
         super.onPause();
         Log.i("onPause()", "onPause()");
 
-        if (Flashlight.getInstance().isFlashLightOn()) {
-            img_switch.setImageResource(R.drawable.img_switch_on);
-            FlashModeHandler.getInstance().setMode(MainActivity.this, indicator);
-        } else {
-            img_switch.setImageResource(R.drawable.img_switch_off);
-            Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
-        }
-
         // to stop the listener and save battery
         if (mSensorManager != null)
             mSensorManager.unregisterListener(this);
@@ -698,6 +777,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i("onResume()", "onResume()");
 
         // for the system's orientation sensor registered listeners
         if (mSensorManager != null)

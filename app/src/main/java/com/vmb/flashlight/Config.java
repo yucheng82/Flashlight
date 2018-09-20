@@ -21,6 +21,7 @@ public class Config {
 
         public static final int SHARE_APP = 100;
         public static final int RATE_APP = 101;
+        public static final int SHARE_FB = 102;
     }
 
     public class Url {

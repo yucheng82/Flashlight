@@ -13,10 +13,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.vmb.flashlight.util.LanguageUtil;
+import com.vmb.touchclick.listener.OnTouchClickListener;
 
 import flashlight.supper.flashlight.R;
 
-public class RequireActivity extends AppCompatActivity {
+public class StagingActivity extends AppCompatActivity {
 
     AlertDialog alertDialog;
 
@@ -66,11 +67,16 @@ public class RequireActivity extends AppCompatActivity {
         TextView lbl_content = alertLayout.findViewById(R.id.lbl_content);
         lbl_content.setText(content);
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(RequireActivity.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(StagingActivity.this);
         alert.setView(alertLayout);
         alertDialog = alert.create();
 
-        alertLayout.findViewById(R.id.img_close).setVisibility(View.GONE);
+        alertLayout.findViewById(R.id.img_close).setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        }, getApplicationContext(), 1));
 
         alertLayout.findViewById(R.id.btn_apply).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +101,7 @@ public class RequireActivity extends AppCompatActivity {
         alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                finish();
                 return true;
             }
         });
@@ -102,8 +109,7 @@ public class RequireActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
-            recreate();
-        }
+        if (requestCode == 1)
+            finish();
     }
 }

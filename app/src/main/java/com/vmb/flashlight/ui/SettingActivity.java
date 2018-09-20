@@ -1,21 +1,28 @@
 package com.vmb.flashlight.ui;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.rey.material.widget.Switch;
+import com.vmb.flashlight.Config;
 import com.vmb.flashlight.base.BaseActivity;
 import com.vmb.flashlight.model.Flashlight;
+import com.vmb.flashlight.util.ShareUtils;
 import com.vmb.flashlight.util.SharedPreferencesUtil;
 import com.vmb.touchclick.listener.OnTouchClickListener;
 
 import flashlight.supper.flashlight.R;
 
+import static com.vmb.flashlight.ui.MainActivity.callbackManager;
+
 public class SettingActivity extends BaseActivity {
 
-    ImageView img_back;
-    ImageView img_about;
-    Switch sw_sound;
+    private ImageView img_back;
+    private ImageView img_about;
+    private ImageView img_share;
+    private ImageView img_rate;
+    private Switch sw_sound;
 
     protected int getResLayout() {
         return R.layout.activity_setting;
@@ -24,6 +31,8 @@ public class SettingActivity extends BaseActivity {
     protected void initView() {
         img_back = findViewById(R.id.img_back);
         img_about = findViewById(R.id.img_about);
+        img_share = findViewById(R.id.img_share);
+        img_rate = findViewById(R.id.img_rate);
         sw_sound = findViewById(R.id.sw_sound);
     }
 
@@ -54,5 +63,30 @@ public class SettingActivity extends BaseActivity {
             sw_sound.setChecked(true);
         else
             sw_sound.setChecked(false);
+
+        img_share.setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareUtils.shareFB(SettingActivity.this);
+            }
+        }, getApplicationContext(), 1));
+
+        img_rate.setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareUtils.rateApp(SettingActivity.this);
+            }
+        }, getApplicationContext(), 1));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Config.RequestCode.SHARE_FB) {
+            if (callbackManager != null) {
+                callbackManager.onActivityResult(requestCode, resultCode, data);
+            }
+        }
     }
 }

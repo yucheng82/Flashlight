@@ -4,7 +4,6 @@
 
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -17,24 +16,36 @@
         android:name="com.vmb.flashlight.MainApplication"
         android:allowBackup="true"
         android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher"
         android:hardwareAccelerated="true"
-        android:screenOrientation="portrait"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:supportsRtl="true"
-        android:launchMode="singleTask">
-        <receiver
-            android:name="com.vmb.flashlight.receiver.ConnectionReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
+        android:launchMode="singleTask"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:screenOrientation="portrait"
+        android:supportsRtl="true">
 
         <activity
-            android:name="com.vmb.flashlight.ui.MainActivity"
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.vmb.flashlight.ui.SplashActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,20 +55,39 @@
         </activity>
 
         <activity
+            android:name="com.vmb.flashlight.ui.MainActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
             android:name="com.vmb.flashlight.ui.SettingActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-
         <activity
-            android:name="com.vmb.flashlight.ui.SplashActivity"
+            android:name="com.vmb.flashlight.ui.StagingActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-
         <activity
             android:name="com.vmb.flashlight.ui.RequireActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
+        <receiver
+            android:name="com.vmb.flashlight.receiver.ConnectionReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider688669748161717"
+            android:exported="true" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="dbb0991bf86a1b4bf810cf6261a6028bd2c54646" />
+
     </application>
 
 </manifest>

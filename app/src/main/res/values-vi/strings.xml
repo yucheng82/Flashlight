@@ -11,7 +11,13 @@
     <string name="loading">Đang tải</string>
     <string name="press_back_again">Ấn back lần nữa để thoát</string>
     <string name="failed_camera">Không thể kết nối đến Flash</string>
-    <string name="rate">Đánh giá</string>
-    <string name="rating">Hãy đánh giá 5* để ủng hộ nhà phát triển nhé</string>
     <string name="not_support_compass">Thiết bị của bạn không hỗ trợ la bàn</string>
+    <string name="rate_title">Chia sẻ và đánh giá</string>
+    <string name="rate_content">Hãy chia sẻ ứng dụng với bạn bè và đánh giá 5* để ủng hộ nhà phát triển nhé</string>
+    <string name="share">Chia sẻ</string>
+    <string name="rate">Đánh giá</string>
+    <string name="no_internet">Không có kết nối mạng</string>
+    <string name="share_error">Chia sẻ bị lỗi, vui lòng thử lại sau !</string>
+    <string name="share_cancel">Đã hủy chia sẻ !</string>
+    <string name="share_success">Bạn đã chia sẻ thành công !</string>
 </resources>

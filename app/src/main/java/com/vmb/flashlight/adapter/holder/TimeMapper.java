@@ -11,7 +11,7 @@ public class TimeMapper {
         String k = "";
         int t = SharedPreferencesUtil.getPrefferInt(context,
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
-        if (t % 10 == 0) {
+        if (t % 10 == 0 && t / 10 > 0) {
             k = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         } else {
             k = Ads.getInstance().getAdmob().getBanner();
@@ -23,7 +23,7 @@ public class TimeMapper {
         String k = "";
         int t = SharedPreferencesUtil.getPrefferInt(context,
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
-        if (t % 10 == 0) {
+        if (t % 10 == 0 && t / 10 > 0) {
             k = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         } else {
             k = Ads.getInstance().getAdmob().getPopup();

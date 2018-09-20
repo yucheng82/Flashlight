@@ -47,7 +47,7 @@ public class AdmobUtil {
 
         String bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
-            bannerId = TimeMapper.mapp1(context);
+            bannerId = Ads.getInstance().getAdmob().getBanner();
             if (TextUtils.isEmpty(bannerId))
                 bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         }
@@ -69,7 +69,21 @@ public class AdmobUtil {
             @Override
             public void onAdFailedToLoad(int i) {
                 super.onAdFailedToLoad(i);
-                Log.i(TAG_BANNER, "onAdFailedToLoad()");
+
+                switch (i){
+                    case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                        Log.i(TAG_BANNER, "onAdFailedToLoad(): ERROR_CODE_INTERNAL_ERROR");
+                        break;
+                    case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                        Log.i(TAG_BANNER, "onAdFailedToLoad(): ERROR_CODE_INVALID_REQUEST");
+                        break;
+                    case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                        Log.i(TAG_BANNER, "onAdFailedToLoad(): ERROR_CODE_NETWORK_ERROR");
+                        break;
+                    case AdRequest.ERROR_CODE_NO_FILL:
+                        Log.i(TAG_BANNER, "onAdFailedToLoad(): ERROR_CODE_NO_FILL");
+                        break;
+                }
 
                 countLoadFailBanner++;
                 Log.i(TAG_BANNER, "countLoadFail = " + countLoadFailBanner);
@@ -131,7 +145,7 @@ public class AdmobUtil {
 
         String popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
-            popupId = TimeMapper.mapp2(activity);
+            popupId = Ads.getInstance().getAdmob().getPopup();
             if (TextUtils.isEmpty(popupId))
                 popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         }
@@ -168,7 +182,21 @@ public class AdmobUtil {
             @Override
             public void onAdFailedToLoad(int i) {
                 super.onAdFailedToLoad(i);
-                Log.i(TAG_POPUP, "onAdFailedToLoad()");
+
+                switch (i){
+                    case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                        Log.i(TAG_POPUP, "onAdFailedToLoad(): ERROR_CODE_INTERNAL_ERROR");
+                        break;
+                    case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                        Log.i(TAG_POPUP, "onAdFailedToLoad(): ERROR_CODE_INVALID_REQUEST");
+                        break;
+                    case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                        Log.i(TAG_POPUP, "onAdFailedToLoad(): ERROR_CODE_NETWORK_ERROR");
+                        break;
+                    case AdRequest.ERROR_CODE_NO_FILL:
+                        Log.i(TAG_POPUP, "onAdFailedToLoad(): ERROR_CODE_NO_FILL");
+                        break;
+                }
 
                 countLoadFailPopup++;
                 Log.i(TAG_POPUP, "countLoadFail = " + countLoadFailPopup);

@@ -20,8 +20,9 @@ android {
         applicationId "flashlight.supper.flashlight"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 6
-        versionName "1.5"
+        versionCode 7
+        versionName "1.6"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -38,10 +39,11 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support:design:27.0.2'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.google.android.gms:play-services-ads:11.0.1'
+    implementation 'com.facebook.android:facebook-share:[4,5)'
     implementation 'com.facebook.android:audience-network-sdk:4.+'
     implementation 'com.github.rey5137:material:1.2.4'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
