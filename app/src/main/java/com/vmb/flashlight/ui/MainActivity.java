@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
+import com.google.firebase.FirebaseApp;
 import com.noname.quangcaoads.QuangCaoSetup;
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.Interface.IAPIControl;
@@ -204,6 +206,8 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
 
     public void initGetAds() {
         if (NetworkUtil.isNetworkAvailable(getApplicationContext())) {
+            FirebaseApp.initializeApp(this);
+            AdsUtil.getInstance().init();
             CountryCodeUtil.getCountryCode(this);
         }
     }
@@ -649,17 +653,25 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                     }
 
                     AdsUtil.getInstance().initCountDown();
-
-                    if (Ads.getInstance().getAds_network().equals("admob")) {
-                        AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
-                    } else {
-                        FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
-                    }
-
-                    FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
-                    AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
-
                     AdsUtil.getInstance().setInitGetAds(true);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (AdsUtil.getInstance().flag)
+                                AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
+                            else {
+                                if (Ads.getInstance().getAds_network().equals("admob")) {
+                                    AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
+                                } else {
+                                    FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
+                                }
+                            }
+
+                            FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
+                            AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
+                        }
+                    }, 1000);
 
                 } else {
                     Log.i(TAG, "response.failed");

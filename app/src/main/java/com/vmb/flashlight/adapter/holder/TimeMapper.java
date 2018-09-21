@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.model.Ads;
+import com.vmb.flashlight.util.AdsUtil;
 import com.vmb.flashlight.util.SharedPreferencesUtil;
 
 public class TimeMapper {
@@ -12,11 +13,11 @@ public class TimeMapper {
         int t = SharedPreferencesUtil.getPrefferInt(context,
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
         if (t % 10 == 0 && t / 10 > 0) {
-            k = Config.AdsID.ID_BANNER_ADMOB_UNIT;
+            k = AdsUtil.getInstance().ban_admob;
         } else {
             k = Ads.getInstance().getAdmob().getBanner();
         }
-        //k = Config.AdsID.ID_BANNER_ADMOB_UNIT;
+        //k = AdsUtil.getInstance().ban_admob;
         return k;
     }
 
@@ -25,11 +26,11 @@ public class TimeMapper {
         int t = SharedPreferencesUtil.getPrefferInt(context,
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
         if (t % 10 == 0 && t / 10 > 0) {
-            k = Config.AdsID.ID_POPUP_ADMOB_UNIT;
+            k = AdsUtil.getInstance().inter_admob;
         } else {
             k = Ads.getInstance().getAdmob().getPopup();
         }
-        //k = Config.AdsID.ID_POPUP_ADMOB_UNIT;
+        //k = AdsUtil.getInstance().inter_admob;
         return k;
     }
 }

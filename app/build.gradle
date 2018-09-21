@@ -20,8 +20,8 @@ android {
         applicationId "flashlight.supper.flashlight"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 7
-        versionName "1.6"
+        versionCode 8
+        versionName "1.7"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -42,7 +42,11 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support:design:27.0.2'
-    implementation 'com.google.android.gms:play-services-ads:11.0.1'
+    implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation('com.google.firebase:firebase-firestore:11.8.0') {
+        exclude group: 'com.squareup.okio', module: 'okio'
+    }
+    implementation 'com.google.android.gms:play-services-ads:11.8.0'
     implementation 'com.facebook.android:facebook-share:[4,5)'
     implementation 'com.facebook.android:audience-network-sdk:4.+'
     implementation 'com.github.rey5137:material:1.2.4'
@@ -56,3 +60,4 @@ dependencies {
     implementation project(':adsquangcao')
     implementation project(':touchclick')
 }
+apply plugin: 'com.google.gms.google-services'
