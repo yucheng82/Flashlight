@@ -20,4 +20,7 @@
     <string name="share_error">Chia sẻ bị lỗi, vui lòng thử lại sau !</string>
     <string name="share_cancel">Đã hủy chia sẻ !</string>
     <string name="share_success">Bạn đã chia sẻ thành công !</string>
+    <string name="setting_flashlight">Cài đặt đèn pin</string>
+    <string name="sound">Âm thanh</string>
+    <string name="credit">Giới thiệu</string>
 </resources>

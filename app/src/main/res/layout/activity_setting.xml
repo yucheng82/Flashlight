@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="Cài đặt đèn pin"
+            android:text="@string/setting_flashlight"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
     </LinearLayout>
@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="Âm thanh"
+                android:text="@string/sound"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -89,7 +89,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="Giới thiệu"
+                android:text="@string/credit"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
         </LinearLayout>

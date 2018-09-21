@@ -8,8 +8,8 @@ public class Config {
     public static final String CODE_CONTROL_APP = "50384";
 
     public class AdsID {
-        public static final String ID_BANNER_ADMOB_UNIT = "ca-app-pub-1058005471378962/4259028925";
-        public static final String ID_POPUP_ADMOB_UNIT = "ca-app-pub-1058005471378962/8076529593";
+        public static final String ID_BANNER_ADMOB_UNIT = "ca-app-pub-7253559581206279/6087271449";
+        public static final String ID_POPUP_ADMOB_UNIT = "ca-app-pub-7253559581206279/7758611615";
 
         public static final String ID_BANNER_FB_UNIT = "1096900620338191_2211887935506115";
         public static final String ID_POPUP_FB_UNIT = "1096900620338191_2211896542171921";

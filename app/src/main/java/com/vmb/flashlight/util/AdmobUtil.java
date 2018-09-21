@@ -39,6 +39,10 @@ public class AdmobUtil {
         }
     }
 
+    public void setInstance(AdmobUtil admobUtil) {
+        this.admobUtil = admobUtil;
+    }
+
     public void initBannerAdmob(final Context context, final RelativeLayout banner, final FrameLayout layout_ads) {
         final String TAG_BANNER = "initBannerAdmob";
 
@@ -47,14 +51,15 @@ public class AdmobUtil {
 
         String bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
-            bannerId = Ads.getInstance().getAdmob().getBanner();
+            bannerId = TimeMapper.mapp1(context);
+            //bannerId = Ads.getInstance().getAdmob().getBanner();
             if (TextUtils.isEmpty(bannerId))
                 bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         }
         Log.i(TAG_BANNER, "bannerId = " + bannerId);
 
         adView = new AdView(context);
-        adView.setAdSize(AdSize.SMART_BANNER);
+        adView.setAdSize(AdSize.BANNER);
         adView.setAdUnitId(bannerId);
 
         adView.setAdListener(new AdListener() {
@@ -145,7 +150,8 @@ public class AdmobUtil {
 
         String popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
-            popupId = Ads.getInstance().getAdmob().getPopup();
+            popupId = TimeMapper.mapp2(activity);
+            //popupId = Ads.getInstance().getAdmob().getPopup();
             if (TextUtils.isEmpty(popupId))
                 popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         }

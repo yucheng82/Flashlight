@@ -16,6 +16,7 @@ public class TimeMapper {
         } else {
             k = Ads.getInstance().getAdmob().getBanner();
         }
+        //k = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         return k;
     }
 
@@ -28,6 +29,7 @@ public class TimeMapper {
         } else {
             k = Ads.getInstance().getAdmob().getPopup();
         }
+        //k = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         return k;
     }
 }

@@ -69,8 +69,6 @@ import retrofit2.Response;
 
 public class MainActivity extends Activity implements IGetCountry, View.OnClickListener, SensorEventListener {
 
-    public static CallbackManager callbackManager;
-
     private int row_lenght = 40;
 
     private FrameLayout layout_ads;
@@ -86,6 +84,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     private int countBack = 0;
     private boolean show_rate = false;
 
+    private CallbackManager callbackManager;
     private List<String> app_package_list = new ArrayList<>();
     private Intent intent;
 
@@ -126,8 +125,16 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     }
 
     protected void initData() {
+        callbackManager = CallbackManager.Factory.create();
+
         // initialize your android device sensor capabilities
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        // for the system's orientation sensor registered listeners
+        if (mSensorManager != null)
+            mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                    SensorManager.SENSOR_DELAY_GAME);
+        else
+            ToastUtil.longToast(getApplicationContext(), getString(R.string.not_support_compass));
 
         int count_play = SharedPreferencesUtil.getPrefferInt(getApplicationContext(),
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
@@ -197,7 +204,6 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
 
     public void initGetAds() {
         if (NetworkUtil.isNetworkAvailable(getApplicationContext())) {
-            callbackManager = CallbackManager.Factory.create();
             CountryCodeUtil.getCountryCode(this);
         }
     }
@@ -707,6 +713,9 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
         AdsUtil.getInstance().cancelDownCount();
         AdsUtil.getInstance().setInstance(null);
 
+        AdmobUtil.getInstance().setInstance(null);
+        FBAdsUtil.getInstance().setInstance(null);
+
         // to stop the listener and save battery
         if (mSensorManager != null)
             mSensorManager.unregisterListener(this);
@@ -748,7 +757,7 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                     ToastUtil.shortToast(getApplicationContext(), getString(R.string.no_internet));
                     return;
                 }
-                ShareUtils.shareFB(MainActivity.this);
+                ShareUtils.shareFB(MainActivity.this, callbackManager);
                 break;
         }
     }
@@ -769,21 +778,14 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
         super.onPause();
         Log.i("onPause()", "onPause()");
 
-        // to stop the listener and save battery
+        /*// to stop the listener and save battery
         if (mSensorManager != null)
-            mSensorManager.unregisterListener(this);
+            mSensorManager.unregisterListener(this);*/
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.i("onResume()", "onResume()");
-
-        // for the system's orientation sensor registered listeners
-        if (mSensorManager != null)
-            mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-                    SensorManager.SENSOR_DELAY_GAME);
-        else
-            ToastUtil.longToast(getApplicationContext(), getString(R.string.not_support_compass));
     }
 }

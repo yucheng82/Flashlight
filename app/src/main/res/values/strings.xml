@@ -22,4 +22,7 @@
     <string name="share_error">Share error !</string>
     <string name="share_cancel">Share cancelled !</string>
     <string name="share_success">Share successfully !</string>
+    <string name="setting_flashlight">Setting</string>
+    <string name="sound">Sound</string>
+    <string name="credit">Credits</string>
 </resources>

@@ -38,6 +38,10 @@ public class FBAdsUtil {
         }
     }
 
+    public void setInstance(FBAdsUtil fbAdsUtils) {
+        this.fbAdsUtils = fbAdsUtils;
+    }
+
     public void initBannerFB(final Context context, final RelativeLayout banner, final FrameLayout layout_ads) {
         final String TAG_BANNER = "initBannerFB";
 

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.facebook.CallbackManager;
 import com.rey.material.widget.Switch;
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.base.BaseActivity;
@@ -14,9 +15,9 @@ import com.vmb.touchclick.listener.OnTouchClickListener;
 
 import flashlight.supper.flashlight.R;
 
-import static com.vmb.flashlight.ui.MainActivity.callbackManager;
-
 public class SettingActivity extends BaseActivity {
+
+    private CallbackManager callbackManager;
 
     private ImageView img_back;
     private ImageView img_about;
@@ -37,6 +38,8 @@ public class SettingActivity extends BaseActivity {
     }
 
     protected void initData() {
+        callbackManager = CallbackManager.Factory.create();
+
         img_back.setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +70,7 @@ public class SettingActivity extends BaseActivity {
         img_share.setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ShareUtils.shareFB(SettingActivity.this);
+                ShareUtils.shareFB(SettingActivity.this, callbackManager);
             }
         }, getApplicationContext(), 1));
 

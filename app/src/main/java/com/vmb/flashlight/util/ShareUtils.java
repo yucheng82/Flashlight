@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.share.Sharer;
@@ -14,8 +15,6 @@ import com.facebook.share.widget.ShareDialog;
 import com.vmb.flashlight.Config;
 
 import flashlight.supper.flashlight.R;
-
-import static com.vmb.flashlight.ui.MainActivity.callbackManager;
 
 /**
  * Created by jacky on 11/21/17.
@@ -33,10 +32,11 @@ public class ShareUtils {
             activity.startActivityForResult(Intent.createChooser(sharingIntent, "Share App"),
                     Config.RequestCode.SHARE_APP);
         } catch (Exception e) {
+
         }
     }
 
-    public static void shareFB(final Activity activity) {
+    public static void shareFB(final Activity activity, CallbackManager callbackManager) {
         final String TAG = "ShareCallback";
 
         if(callbackManager == null) {
@@ -60,8 +60,8 @@ public class ShareUtils {
 
             @Override
             public void onError(FacebookException error) {
-                ToastUtil.shortToast(activity, activity.getString(R.string.share_error));
-                Log.i(TAG, "onError");
+                ToastUtil.shortToast(activity, activity.getString(R.string.share_error) + "\n" + error.getMessage());
+                Log.i(TAG, "onError: " + error.getMessage());
             }
         }, Config.RequestCode.SHARE_FB);
 
