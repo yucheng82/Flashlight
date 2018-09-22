@@ -13,7 +13,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -39,8 +38,8 @@ import com.google.firebase.FirebaseApp;
 import com.noname.quangcaoads.QuangCaoSetup;
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.Interface.IAPIControl;
-import com.vmb.flashlight.Interface.IGetCountry;
 import com.vmb.flashlight.adapter.ItemAdapter;
+import com.vmb.flashlight.adapter.holder.TimeMapper;
 import com.vmb.flashlight.handler.FlashModeHandler;
 import com.vmb.flashlight.handler.LoadIconShortcut;
 import com.vmb.flashlight.model.Ads;
@@ -69,7 +68,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends Activity implements IGetCountry, View.OnClickListener, SensorEventListener {
+public class MainActivity extends Activity implements View.OnClickListener, SensorEventListener {
 
     private int row_lenght = 40;
 
@@ -207,8 +206,9 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     public void initGetAds() {
         if (NetworkUtil.isNetworkAvailable(getApplicationContext())) {
             FirebaseApp.initializeApp(this);
-            AdsUtil.getInstance().init();
-            CountryCodeUtil.getCountryCode(this);
+            AdsUtil.getInstance().init(getApplicationContext());
+            CountryCodeUtil.setCountryCode(getApplicationContext());
+            callAPI();
         }
     }
 
@@ -561,27 +561,23 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
         // not in use
     }
 
-    @Override
-    public void onGetCountry(final String country) {
-        final String TAG = "onGetCountry";
-        if (isFinishing()) {
-            Log.i(TAG, "activity.isFinishing()");
-            return;
-        }
+    public void callAPI() {
+        final String TAG = "callAPI()";
 
-        final String deviceID = DeviceUtil.getDeviceId(getApplicationContext());
+        String deviceID = DeviceUtil.getDeviceId(getApplicationContext());
         Log.i(TAG, "deviceID = " + deviceID);
-        final String code = Config.CODE_CONTROL_APP;
+        String code = Config.CODE_CONTROL_APP;
         Log.i(TAG, "code = " + code);
-        final String version = Config.VERSION_APP;
+        String version = Config.VERSION_APP;
         Log.i(TAG, "version = " + version);
-        final String timereg = TimeRegUtil.getTimeRegister(getApplicationContext());
+        String timereg = TimeRegUtil.getTimeRegister(getApplicationContext());
         Log.i(TAG, "timereg = " + timereg);
-        final String packg = Config.PACKAGE_NAME;
+        String packg = Config.PACKAGE_NAME;
         Log.i(TAG, "packg = " + packg);
+        String country_code = CountryCodeUtil.getCountryCode(getApplicationContext());
 
         IAPIControl api = RetrofitInitiator.createService(IAPIControl.class, Config.Url.URL_BASE);
-        Call<Ads> call = api.getAds(deviceID, code, version, country, timereg, packg);
+        Call<Ads> call = api.getAds(deviceID, code, version, country_code, timereg, packg);
         call.enqueue(new Callback<Ads>() {
             @Override
             public void onResponse(Call<Ads> call, Response<Ads> response) {
@@ -652,26 +648,20 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
                         });
                     }
 
+                    if (TimeMapper.mapp(getApplicationContext()))
+                        Ads.getInstance().setAds_network("admob");
+
                     AdsUtil.getInstance().initCountDown();
                     AdsUtil.getInstance().setInitGetAds(true);
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (AdsUtil.getInstance().flag)
-                                AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
-                            else {
-                                if (Ads.getInstance().getAds_network().equals("admob")) {
-                                    AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
-                                } else {
-                                    FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
-                                }
-                            }
+                    if (Ads.getInstance().getAds_network().equals("admob")) {
+                        AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
+                    } else {
+                        FBAdsUtil.getInstance().initBannerFB(getApplicationContext(), banner, layout_ads);
+                    }
 
-                            FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
-                            AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
-                        }
-                    }, 1000);
+                    FBAdsUtil.getInstance().initInterstitialFB(MainActivity.this);
+                    AdmobUtil.getInstance().initInterstitialAdmob(MainActivity.this);
 
                 } else {
                     Log.i(TAG, "response.failed");
@@ -789,10 +779,6 @@ public class MainActivity extends Activity implements IGetCountry, View.OnClickL
     protected void onPause() {
         super.onPause();
         Log.i("onPause()", "onPause()");
-
-        /*// to stop the listener and save battery
-        if (mSensorManager != null)
-            mSensorManager.unregisterListener(this);*/
     }
 
     @Override

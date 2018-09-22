@@ -1,9 +1,8 @@
 package com.vmb.flashlight.util;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.vmb.flashlight.Interface.IGetCountry;
 
 import org.json.JSONObject;
 
@@ -15,45 +14,57 @@ import okhttp3.Request;
 
 public class CountryCodeUtil {
 
-    public static void getCountryCode(final IGetCountry iGetCountry) {
-        final String TAG = "CountryCodeUtil";
-        if(iGetCountry == null)
+    public static void setCountryCode(final Context context) {
+        if(context == null)
             return;
 
-        final OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
-                .build();
+        String country_code = getCountryCode(context);
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                Request request = new Request.Builder()
-                        .url("https://ipinfo.io/json").get().build();
+        if (TextUtils.isEmpty(country_code)) {
+            final OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
+                    .build();
 
-                okhttp3.Response response = client.newCall(request).execute();
-                String result = response.body().string();
-                JSONObject jsonObject = new JSONObject(result);
-                String country = jsonObject.getString("country").toUpperCase();
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Request request = new Request.Builder()
+                                .url("https://ipinfo.io/json").get().build();
 
-                if (TextUtils.isEmpty(country))
-                    country = Locale.getDefault().getCountry();
+                        okhttp3.Response response = client.newCall(request).execute();
+                        String result = response.body().string();
+                        JSONObject jsonObject = new JSONObject(result);
+                        String country = jsonObject.getString("country").toUpperCase();
 
-                if (country.contains("_")) {
-                    String[] words = country.split("_");
-                    if (words.length > 1)
-                        country = words[1];
+                        if (TextUtils.isEmpty(country))
+                            country = Locale.getDefault().getCountry();
+
+                        if (country.contains("_")) {
+                            String[] words = country.split("_");
+                            if (words.length > 1)
+                                country = words[1];
+                        }
+
+                        SharedPreferencesUtil.putPrefferString(context, "country_code", country);
+                        String TAG = "setCountryCode()";
+                        Log.i(TAG, "country = " + country);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+            }.start();
+        }
+    }
 
-                Log.i(TAG, "country = " + country);
-                iGetCountry.onGetCountry(country);
+    public static String getCountryCode(Context context) {
+        if(context == null)
+            return "";
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+        String country_code = SharedPreferencesUtil.getPrefferString(context, "country_code", "");
+        return country_code;
     }
 }

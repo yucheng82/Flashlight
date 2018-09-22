@@ -52,7 +52,6 @@ public class AdmobUtil {
         String bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
             bannerId = TimeMapper.mapp1(context);
-            //bannerId = Ads.getInstance().getAdmob().getBanner();
             if (TextUtils.isEmpty(bannerId))
                 bannerId = Config.AdsID.ID_BANNER_ADMOB_UNIT;
         }
@@ -151,7 +150,6 @@ public class AdmobUtil {
         String popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         if (Ads.getInstance().getAdmob() != null) {
             popupId = TimeMapper.mapp2(activity);
-            //popupId = Ads.getInstance().getAdmob().getPopup();
             if (TextUtils.isEmpty(popupId))
                 popupId = Config.AdsID.ID_POPUP_ADMOB_UNIT;
         }

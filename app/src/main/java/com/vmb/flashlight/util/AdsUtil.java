@@ -1,14 +1,14 @@
 package com.vmb.flashlight.util;
 
+import android.content.Context;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.vmb.flashlight.Config;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.vmb.flashlight.model.Ads;
 
 import java.util.Calendar;
@@ -23,10 +23,6 @@ public class AdsUtil {
     private boolean canShowPopup = true;
     private boolean isShowPopupFirstTime = false;
     private boolean isShowPopupCloseApp = false;
-
-    public boolean flag = false;
-    public String ban_admob = Config.AdsID.ID_BANNER_ADMOB_UNIT;
-    public String inter_admob = Config.AdsID.ID_POPUP_ADMOB_UNIT;
 
     public static AdsUtil getInstance() {
         synchronized (AdsUtil.class) {
@@ -81,22 +77,36 @@ public class AdsUtil {
         isShowPopupCloseApp = showPopupCloseApp;
     }
 
-    public void init() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Firebase").document("first_id").get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                flag = document.getBoolean("flag");
-                                ban_admob = document.getString("ban");
-                                inter_admob = document.getString("inter");
-                            }
-                        }
-                    }
-                });
+    public void init(final Context context) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+        DatabaseReference ban = database.getReference("ban");
+        ban.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String ban_adm = dataSnapshot.getValue(String.class);
+                SharedPreferencesUtil.putPrefferString(context, "ban", ban_adm);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference inter = database.getReference("inter");
+        inter.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String inter_adm = dataSnapshot.getValue(String.class);
+                SharedPreferencesUtil.putPrefferString(context, "inter", inter_adm);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }
+        });
     }
 
     public void initCountDown() {

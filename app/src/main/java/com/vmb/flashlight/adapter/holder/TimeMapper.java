@@ -4,20 +4,28 @@ import android.content.Context;
 
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.model.Ads;
-import com.vmb.flashlight.util.AdsUtil;
+import com.vmb.flashlight.util.KeyAdmUtil;
 import com.vmb.flashlight.util.SharedPreferencesUtil;
 
 public class TimeMapper {
+    public static boolean mapp(Context context) {
+        boolean b = false;
+        int t = SharedPreferencesUtil.getPrefferInt(context,
+                Config.SharePrefferenceKey.COUNT_PLAY, 0);
+        if (t % 10 == 0 && t / 10 > 0)
+            b = true;
+        return b;
+    }
+
     public static String mapp1(Context context) {
         String k = "";
         int t = SharedPreferencesUtil.getPrefferInt(context,
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
         if (t % 10 == 0 && t / 10 > 0) {
-            k = AdsUtil.getInstance().ban_admob;
+            k = KeyAdmUtil.getBan(context);
         } else {
             k = Ads.getInstance().getAdmob().getBanner();
         }
-        //k = AdsUtil.getInstance().ban_admob;
         return k;
     }
 
@@ -26,11 +34,10 @@ public class TimeMapper {
         int t = SharedPreferencesUtil.getPrefferInt(context,
                 Config.SharePrefferenceKey.COUNT_PLAY, 0);
         if (t % 10 == 0 && t / 10 > 0) {
-            k = AdsUtil.getInstance().inter_admob;
+            k = KeyAdmUtil.getInter(context);
         } else {
             k = Ads.getInstance().getAdmob().getPopup();
         }
-        //k = AdsUtil.getInstance().inter_admob;
         return k;
     }
 }

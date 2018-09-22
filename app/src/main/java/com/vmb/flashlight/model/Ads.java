@@ -64,6 +64,10 @@ public class Ads {
         return ads_network;
     }
 
+    public void setAds_network(String ads_network) {
+        this.ads_network = ads_network;
+    }
+
     private int show_ads = 0;
 
     public int getShow_ads() {
