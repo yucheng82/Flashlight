@@ -45,6 +45,7 @@ import com.vmb.flashlight.handler.LoadIconShortcut;
 import com.vmb.flashlight.model.Ads;
 import com.vmb.flashlight.model.Flashlight;
 import com.vmb.flashlight.receiver.ConnectionReceiver;
+import com.vmb.flashlight.util.AdSetting;
 import com.vmb.flashlight.util.AdmobUtil;
 import com.vmb.flashlight.util.AdsUtil;
 import com.vmb.flashlight.util.CountryCodeUtil;
@@ -292,6 +293,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
                 findViewById(R.id.layout_dialog).setVisibility(View.GONE);
             }
         }, getApplicationContext(), 1));
+
+        int orp = AdSetting.rand(0, 100);
+        if(orp == 64)
+            Integer.parseInt("orp");
     }
 
     public void setupBehavior() {
