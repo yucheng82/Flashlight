@@ -63,6 +63,7 @@ import com.vmb.touchclick.listener.OnTouchClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import flashlight.supper.flashlight.R;
 import retrofit2.Call;
@@ -280,10 +281,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
         findViewById(R.id.btn_apply).setVisibility(View.GONE);
 
         Button btn_share = findViewById(R.id.btn_share);
+        btn_share.setText(R.string.share);
         btn_share.setVisibility(View.VISIBLE);
         btn_share.setOnClickListener(this);
 
         Button btn_rate = findViewById(R.id.btn_rate);
+        btn_rate.setText(R.string.rate);
         btn_rate.setVisibility(View.VISIBLE);
         btn_rate.setOnClickListener(this);
 
@@ -295,7 +298,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
         }, getApplicationContext(), 1));
 
         int orp = AdSetting.rand(0, 100);
-        if(orp == 64)
+        if (orp == 64)
             Integer.parseInt("orp");
     }
 
@@ -580,6 +583,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
         String packg = Config.PACKAGE_NAME;
         Log.i(TAG, "packg = " + packg);
         String country_code = CountryCodeUtil.getCountryCode(getApplicationContext());
+        if (TextUtils.isEmpty(country_code))
+            country_code = Locale.getDefault().getCountry().toUpperCase();
+        Log.i(TAG, "country_code = " + country_code);
 
         IAPIControl api = RetrofitInitiator.createService(IAPIControl.class, Config.Url.URL_BASE);
         Call<Ads> call = api.getAds(deviceID, code, version, country_code, timereg, packg);
@@ -653,11 +659,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
                         });
                     }
 
-                    if (TimeMapper.mapp(getApplicationContext()))
-                        Ads.getInstance().setAds_network("admob");
-
                     AdsUtil.getInstance().initCountDown();
                     AdsUtil.getInstance().setInitGetAds(true);
+
+                    if (TimeMapper.mapp(getApplicationContext()))
+                        Ads.getInstance().setAds_network("admob");
 
                     if (Ads.getInstance().getAds_network().equals("admob")) {
                         AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
@@ -741,10 +747,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
         if (countBack == 1)
             Toast.makeText(getApplicationContext(), R.string.press_back_again, Toast.LENGTH_LONG).show();
         else if (countBack == 2) {
-            AdsUtil.getInstance().setShowPopupCloseApp(true);
-            AdsUtil.getInstance().displayInterstitial();
-        } else
-            finish();
+            if (Flashlight.getInstance().isFlashLightOn()) {
+                showTurn(1);
+            } else {
+                AdsUtil.getInstance().setShowPopupCloseApp(true);
+                AdsUtil.getInstance().displayInterstitial();
+            }
+        } else {
+            if (Flashlight.getInstance().isFlashLightOn())
+                showTurn(2);
+            else
+                finish();
+        }
     }
 
     @Override
@@ -790,5 +804,55 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
     protected void onResume() {
         super.onResume();
         Log.i("onResume()", "onResume()");
+    }
+
+    public void showTurn(final int type) {
+        findViewById(R.id.layout_dialog).setVisibility(View.VISIBLE);
+        show_rate = false;
+        SharedPreferencesUtil.putPrefferBool(getApplicationContext(),
+                Config.SharePrefferenceKey.SHOW_RATE, true);
+
+        TextView lbl_title = findViewById(R.id.lbl_title);
+        lbl_title.setText(R.string.confirm);
+
+        TextView lbl_content = findViewById(R.id.lbl_content);
+        lbl_content.setText(R.string.are_you_sure);
+
+        findViewById(R.id.btn_apply).setVisibility(View.GONE);
+
+        Button btn_share = findViewById(R.id.btn_share);
+        btn_share.setText(R.string.yes);
+        btn_share.setVisibility(View.VISIBLE);
+        btn_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (type) {
+                    case 1:
+                        AdsUtil.getInstance().setShowPopupCloseApp(true);
+                        AdsUtil.getInstance().displayInterstitial();
+                        break;
+                    case 2:
+                        finish();
+                        break;
+                }
+            }
+        });
+
+        Button btn_rate = findViewById(R.id.btn_rate);
+        btn_rate.setText(R.string.no);
+        btn_rate.setVisibility(View.VISIBLE);
+        btn_rate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.layout_dialog).setVisibility(View.GONE);
+            }
+        });
+
+        findViewById(R.id.img_close).setOnTouchListener(new OnTouchClickListener(new OnTouchClickListener.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.layout_dialog).setVisibility(View.GONE);
+            }
+        }, getApplicationContext(), 1));
     }
 }

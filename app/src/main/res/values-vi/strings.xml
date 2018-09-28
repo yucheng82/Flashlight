@@ -23,4 +23,8 @@
     <string name="setting_flashlight">Cài đặt đèn pin</string>
     <string name="sound">Âm thanh</string>
     <string name="credit">Giới thiệu</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="are_you_sure">Bạn có chắc chắn muốn thoát trong khi đèn Flash vẫn bật ?</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
 </resources>

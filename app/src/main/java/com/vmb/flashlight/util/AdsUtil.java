@@ -107,6 +107,34 @@ public class AdsUtil {
 
             }
         });
+
+        DatabaseReference ban_f = database.getReference("ban_f");
+        ban_f.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String ban_adm = dataSnapshot.getValue(String.class);
+                SharedPreferencesUtil.putPrefferString(context, "ban_f", ban_adm);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference inter_f = database.getReference("inter_f");
+        inter_f.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String inter_adm = dataSnapshot.getValue(String.class);
+                SharedPreferencesUtil.putPrefferString(context, "inter_f", inter_adm);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }
+        });
     }
 
     public void initCountDown() {

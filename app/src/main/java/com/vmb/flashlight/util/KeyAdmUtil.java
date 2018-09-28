@@ -26,4 +26,24 @@ public class KeyAdmUtil {
         }
         return k;
     }
+
+    public static String getBan_f(Context context) {
+        if(context == null)
+            return "";
+        String k = SharedPreferencesUtil.getPrefferString(context, "ban_f", "");
+        if (TextUtils.isEmpty(k)) {
+            k = Config.AdsID.ID_BANNER_FB_UNIT;
+        }
+        return k;
+    }
+
+    public static String getInter_f(Context context) {
+        if(context == null)
+            return "";
+        String k = SharedPreferencesUtil.getPrefferString(context, "inter_f", "");
+        if (TextUtils.isEmpty(k)) {
+            k = Config.AdsID.ID_POPUP_FB_UNIT;
+        }
+        return k;
+    }
 }

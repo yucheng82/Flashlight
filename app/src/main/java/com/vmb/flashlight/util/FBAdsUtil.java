@@ -16,6 +16,7 @@ import com.facebook.ads.AdView;
 import com.facebook.ads.InterstitialAd;
 import com.facebook.ads.InterstitialAdListener;
 import com.vmb.flashlight.Config;
+import com.vmb.flashlight.adapter.holder.TimeMapper;
 import com.vmb.flashlight.model.Ads;
 
 import java.util.Calendar;

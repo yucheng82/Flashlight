@@ -10,7 +10,7 @@ public class AdSetting {
 
     public static void addTestDevice() {
         List<String> testDevices = new ArrayList<>();
-        AdSettings.addTestDevice("ec98be7b-e9f0-46e3-82a7-7c229ad48b86");
+        AdSettings.addTestDevice("938e3e29-f81b-4aba-bd74-c0d4272dbef3");
         AdSettings.addTestDevices(testDevices);
     }
 

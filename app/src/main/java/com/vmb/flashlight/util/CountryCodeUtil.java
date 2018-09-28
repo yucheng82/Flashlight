@@ -15,6 +15,7 @@ import okhttp3.Request;
 public class CountryCodeUtil {
 
     public static void setCountryCode(final Context context) {
+        final String TAG = "setCountryCode()";
         if(context == null)
             return;
 
@@ -40,7 +41,7 @@ public class CountryCodeUtil {
                         String country = jsonObject.getString("country").toUpperCase();
 
                         if (TextUtils.isEmpty(country))
-                            country = Locale.getDefault().getCountry();
+                            country = Locale.getDefault().getCountry().toUpperCase();
 
                         if (country.contains("_")) {
                             String[] words = country.split("_");
@@ -49,10 +50,10 @@ public class CountryCodeUtil {
                         }
 
                         SharedPreferencesUtil.putPrefferString(context, "country_code", country);
-                        String TAG = "setCountryCode()";
                         Log.i(TAG, "country = " + country);
 
                     } catch (Exception e) {
+                        Log.i(TAG, "catch: " + e.getMessage());
                         e.printStackTrace();
                     }
                 }

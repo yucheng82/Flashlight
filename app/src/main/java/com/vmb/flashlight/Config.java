@@ -11,8 +11,8 @@ public class Config {
         public static final String ID_BANNER_ADMOB_UNIT = "ca-app-pub-7253559581206279/6087271449";
         public static final String ID_POPUP_ADMOB_UNIT = "ca-app-pub-7253559581206279/7758611615";
 
-        public static final String ID_BANNER_FB_UNIT = "1096900620338191_2211887935506115";
-        public static final String ID_POPUP_FB_UNIT = "1096900620338191_2211896542171921";
+        public static final String ID_BANNER_FB_UNIT = "688669748161717_688670691494956";
+        public static final String ID_POPUP_FB_UNIT = "688669748161717_688670391494986";
     }
 
     public class RequestCode {
