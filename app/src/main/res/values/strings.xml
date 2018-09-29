@@ -26,7 +26,7 @@
     <string name="sound">Sound</string>
     <string name="credit">Credits</string>
     <string name="confirm">Confirm</string>
-    <string name="are_you_sure">Are you sure want to exit while flashlight is still on ?</string>
+    <string name="are_you_sure">Do you want to turn off Flash after exiting the application ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 </resources>

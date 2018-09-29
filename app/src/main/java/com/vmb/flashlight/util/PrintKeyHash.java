@@ -9,9 +9,9 @@ import android.util.Log;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class PrintKeyCode {
+public class PrintKeyHash {
 
-    public static String printKeyHash(Context context) {
+    public static String print(Context context) {
         String TAG = "printKeyHash";
         String key = "KeyHash empty";
 

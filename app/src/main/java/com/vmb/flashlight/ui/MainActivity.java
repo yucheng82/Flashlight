@@ -826,6 +826,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
         btn_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Turn off flashlight
+                Flashlight.getInstance().setFlashLightOn(false);
+                Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_OFF);
+
                 switch (type) {
                     case 1:
                         AdsUtil.getInstance().setShowPopupCloseApp(true);
@@ -844,7 +848,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
         btn_rate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.layout_dialog).setVisibility(View.GONE);
+                switch (type) {
+                    case 1:
+                        AdsUtil.getInstance().setShowPopupCloseApp(true);
+                        AdsUtil.getInstance().displayInterstitial();
+                        break;
+                    case 2:
+                        finish();
+                        break;
+                }
             }
         });
 
