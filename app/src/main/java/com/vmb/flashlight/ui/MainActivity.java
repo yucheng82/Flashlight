@@ -34,18 +34,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
-import com.google.firebase.FirebaseApp;
 import com.noname.quangcaoads.QuangCaoSetup;
 import com.vmb.flashlight.Config;
 import com.vmb.flashlight.Interface.IAPIControl;
 import com.vmb.flashlight.adapter.ItemAdapter;
-import com.vmb.flashlight.adapter.holder.TimeMapper;
 import com.vmb.flashlight.handler.FlashModeHandler;
 import com.vmb.flashlight.handler.LoadIconShortcut;
 import com.vmb.flashlight.model.Ads;
 import com.vmb.flashlight.model.Flashlight;
 import com.vmb.flashlight.receiver.ConnectionReceiver;
-import com.vmb.flashlight.util.AdSetting;
 import com.vmb.flashlight.util.AdmobUtil;
 import com.vmb.flashlight.util.AdsUtil;
 import com.vmb.flashlight.util.CountryCodeUtil;
@@ -71,8 +68,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends Activity implements View.OnClickListener, SensorEventListener {
-
-    private int row_lenght = 40;
+    private CallbackManager callbackManager;
 
     private FrameLayout layout_ads;
     private RelativeLayout banner;
@@ -83,13 +79,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
     private LinearLayout container;
     private TextView lbl_indicator_light;
 
+    private List<String> app_package_list = new ArrayList<>();
+
+    private int row_lenght = 40;
     private int indicator = 0;
     private int countBack = 0;
     private boolean show_rate = false;
-
-    private CallbackManager callbackManager;
-    private List<String> app_package_list = new ArrayList<>();
-    private Intent intent;
 
     // record the compass picture angle turned
     private float currentDegree = 0f;
@@ -177,13 +172,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
         boolean sound = SharedPreferencesUtil.getPrefferBool(getApplicationContext(), "sound", true);
         Flashlight.getInstance().setSound(sound);
         ConnectionReceiver.getInstance().setActivity(MainActivity.this);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                QuangCaoSetup.initiate(MainActivity.this);
-            }
-        }).run();
     }
 
     public void setupCamera() {
@@ -207,10 +195,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
 
     public void initGetAds() {
         if (NetworkUtil.isNetworkAvailable(getApplicationContext())) {
-            FirebaseApp.initializeApp(this);
-            AdsUtil.getInstance().init(getApplicationContext());
-            CountryCodeUtil.setCountryCode(getApplicationContext());
             callAPI();
+            QuangCaoSetup.initiate(MainActivity.this);
+            CountryCodeUtil.setCountryCode(getApplicationContext());
         }
     }
 
@@ -296,10 +283,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
                 findViewById(R.id.layout_dialog).setVisibility(View.GONE);
             }
         }, getApplicationContext(), 1));
-
-        int orp = AdSetting.rand(0, 100);
-        if (orp == 64)
-            Integer.parseInt("orp");
     }
 
     public void setupBehavior() {
@@ -376,7 +359,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
                                             new Thread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    AdsUtil.getInstance().displayInterstitial();
+                                                    AdsUtil.getInstance().displayInterstitial(getApplicationContext());
                                                 }
                                             }).run();
                                         }
@@ -425,7 +408,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
                                             new Thread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    AdsUtil.getInstance().displayInterstitial();
+                                                    AdsUtil.getInstance().displayInterstitial(getApplicationContext());
                                                 }
                                             }).run();
                                         }
@@ -635,24 +618,26 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
                     }
 
                     if (Ads.getInstance().getUpdate_status() != 0) {
-                        Bundle bundle = new Bundle();
+                        final Bundle bundle = new Bundle();
                         bundle.putString("update_title_vn", Ads.getInstance().getUpdate_title_vn());
                         bundle.putString("update_title_en", Ads.getInstance().getUpdate_title_en());
                         bundle.putString("update_message_vn", Ads.getInstance().getUpdate_message_vn());
                         bundle.putString("update_message_en", Ads.getInstance().getUpdate_message_en());
                         bundle.putString("update_url", Ads.getInstance().getUpdate_url());
 
-                        if (Ads.getInstance().getUpdate_status() == 1) {
-                            intent = new Intent(MainActivity.this, StagingActivity.class);
-                            intent.putExtras(bundle);
-                        } else if (Ads.getInstance().getUpdate_status() == 2) {
-                            intent = new Intent(MainActivity.this, RequireActivity.class);
-                            intent.putExtras(bundle);
-                        }
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                Intent intent = null;
+
+                                if (Ads.getInstance().getUpdate_status() == 1) {
+                                    intent = new Intent(MainActivity.this, StagingActivity.class);
+                                    intent.putExtras(bundle);
+                                } else if (Ads.getInstance().getUpdate_status() == 2) {
+                                    intent = new Intent(MainActivity.this, RequireActivity.class);
+                                    intent.putExtras(bundle);
+                                }
+
                                 if (intent != null)
                                     startActivity(intent);
                             }
@@ -661,9 +646,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
 
                     AdsUtil.getInstance().initCountDown();
                     AdsUtil.getInstance().setInitGetAds(true);
-
-                    if (TimeMapper.mapp(getApplicationContext()))
-                        Ads.getInstance().setAds_network("admob");
 
                     if (Ads.getInstance().getAds_network().equals("admob")) {
                         AdmobUtil.getInstance().initBannerAdmob(getApplicationContext(), banner, layout_ads);
@@ -715,23 +697,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
 
     @Override
     protected void onDestroy() {
-        if (!Flashlight.getInstance().isFlashLightOn()) {
-            if (Flashlight.getInstance().getCamera() != null) {
-                Flashlight.getInstance().getCamera().stopPreview();
-                Flashlight.getInstance().getCamera().release();
-                Flashlight.getInstance().setInstance(null);
-            }
-        }
-
-        AdsUtil.getInstance().cancelDownCount();
-        AdsUtil.getInstance().setInstance(null);
-
-        AdmobUtil.getInstance().setInstance(null);
-        FBAdsUtil.getInstance().setInstance(null);
-
-        // to stop the listener and save battery
-        if (mSensorManager != null)
-            mSensorManager.unregisterListener(this);
+        destroy();
         super.onDestroy();
     }
 
@@ -750,8 +716,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
             if (Flashlight.getInstance().isFlashLightOn()) {
                 showTurn(1);
             } else {
-                AdsUtil.getInstance().setShowPopupCloseApp(true);
-                AdsUtil.getInstance().displayInterstitial();
+                finish();
+                AdsUtil.getInstance().displayInterstitial(getApplicationContext());
             }
         } else {
             if (Flashlight.getInstance().isFlashLightOn())
@@ -832,8 +798,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
 
                 switch (type) {
                     case 1:
-                        AdsUtil.getInstance().setShowPopupCloseApp(true);
-                        AdsUtil.getInstance().displayInterstitial();
+                        finish();
+                        AdsUtil.getInstance().displayInterstitial(getApplicationContext());
                         break;
                     case 2:
                         finish();
@@ -850,8 +816,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
             public void onClick(View v) {
                 switch (type) {
                     case 1:
-                        AdsUtil.getInstance().setShowPopupCloseApp(true);
-                        AdsUtil.getInstance().displayInterstitial();
+                        finish();
+                        AdsUtil.getInstance().displayInterstitial(getApplicationContext());
                         break;
                     case 2:
                         finish();
@@ -866,5 +832,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
                 findViewById(R.id.layout_dialog).setVisibility(View.GONE);
             }
         }, getApplicationContext(), 1));
+    }
+
+    public void destroy() {
+        if (!Flashlight.getInstance().isFlashLightOn()) {
+            if (Flashlight.getInstance().getCamera() != null) {
+                Flashlight.getInstance().getCamera().stopPreview();
+                Flashlight.getInstance().getCamera().release();
+            }
+        }
+        AdsUtil.getInstance().cancelDownCount();
+
+        // to stop the listener and save battery
+        if (mSensorManager != null)
+            mSensorManager.unregisterListener(this);
     }
 }

@@ -4,11 +4,6 @@ import android.content.Context;
 import android.os.CountDownTimer;
 import android.util.Log;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.vmb.flashlight.model.Ads;
 
 import java.util.Calendar;
@@ -21,8 +16,6 @@ public class AdsUtil {
 
     private boolean isInitGetAds = false;
     private boolean canShowPopup = true;
-    private boolean isShowPopupFirstTime = false;
-    private boolean isShowPopupCloseApp = false;
 
     public static AdsUtil getInstance() {
         synchronized (AdsUtil.class) {
@@ -33,15 +26,11 @@ public class AdsUtil {
         }
     }
 
-    public void setInstance(AdsUtil adsUtils) {
-        this.adsUtils = adsUtils;
-    }
-
-    public void displayInterstitial() {
+    public void displayInterstitial(Context context) {
         if (Ads.getInstance().getAds_network().equals("admob")) {
-            AdmobUtil.getInstance().displayInterstitial();
+            AdmobUtil.getInstance().displayInterstitial(context);
         } else {
-            FBAdsUtil.getInstance().displayInterstitial();
+            FBAdsUtil.getInstance().displayInterstitial(context);
         }
     }
 
@@ -61,56 +50,10 @@ public class AdsUtil {
         return canShowPopup;
     }
 
-    public boolean isShowPopupFirstTime() {
-        return isShowPopupFirstTime;
-    }
-
-    public void setShowPopupFirstTime(boolean showPopupFirstTime) {
-        isShowPopupFirstTime = showPopupFirstTime;
-    }
-
-    public boolean isShowPopupCloseApp() {
-        return isShowPopupCloseApp;
-    }
-
-    public void setShowPopupCloseApp(boolean showPopupCloseApp) {
-        isShowPopupCloseApp = showPopupCloseApp;
-    }
-
-    public void init(final Context context) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-        DatabaseReference ban = database.getReference("ban");
-        ban.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String ban_adm = dataSnapshot.getValue(String.class);
-                SharedPreferencesUtil.putPrefferString(context, "ban", ban_adm);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-
-            }
-        });
-
-        DatabaseReference inter = database.getReference("inter");
-        inter.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String inter_adm = dataSnapshot.getValue(String.class);
-                SharedPreferencesUtil.putPrefferString(context, "inter", inter_adm);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-
-            }
-        });
-    }
-
     public void initCountDown() {
         String TAG = "initCountDown";
+        timeStart = Calendar.getInstance();
+        canShowPopup = false;
 
         if (Ads.getInstance() == null || Ads.getInstance().getConfig() == null) {
             Log.i(TAG, "Ads.getInstance() null || Ads.getInstance().getConfig() null");

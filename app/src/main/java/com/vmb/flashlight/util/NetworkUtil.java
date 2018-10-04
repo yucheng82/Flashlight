@@ -16,7 +16,7 @@ public class NetworkUtil {
 
         NetworkInfo info = manager.getActiveNetworkInfo();
 
-        if (null == info)
+        if (info == null)
             return false;
 
         if (!info.isAvailable()) {

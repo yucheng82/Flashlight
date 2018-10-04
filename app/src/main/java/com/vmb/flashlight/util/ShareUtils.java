@@ -65,7 +65,7 @@ public class ShareUtils {
                     @Override
                     public void run() {
                         try {
-                            String timeRegister = com.noname.quangcaoads.util.SharedPreferencesGlobalUtil.getValue(activity, "time_register");
+                            String timeRegister = TimeRegUtil.getTimeRegister(activity);
                             if (TextUtils.isEmpty(timeRegister))
                                 timeRegister = String.valueOf(System.currentTimeMillis() / 1000);
 

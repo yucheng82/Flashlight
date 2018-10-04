@@ -3,7 +3,6 @@ package com.vmb.flashlight;
 import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.FirebaseApp;
 import com.noname.quangcaoads.QuangCaoSetup;
 import com.vmb.flashlight.util.TimeRegUtil;
 

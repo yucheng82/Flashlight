@@ -38,15 +38,16 @@ public class FlashModeHandler {
                     isOn = false;
                 } else {
                     // Turn on flashlight
-                    if(Flashlight.getInstance().getCamera() == null)
-                        return;
-
                     Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
+                                if(Flashlight.getInstance().getCamera() == null)
+                                    return;
+
                                 Flashlight.getInstance().getCamera().startPreview();
+
                             } catch (Exception e) {
                                 return;
                             }
@@ -72,15 +73,16 @@ public class FlashModeHandler {
             case 0:
                 if (Flashlight.getInstance().isFlashLightOn() == true) {
                     // Turn on flashlight
-                    if(Flashlight.getInstance().getCamera() == null)
-                        return;
-
                     Flashlight.getInstance().toggle(Camera.Parameters.FLASH_MODE_TORCH);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
+                                if(Flashlight.getInstance().getCamera() == null)
+                                    return;
+
                                 Flashlight.getInstance().getCamera().startPreview();
+
                             } catch (Exception e) {
                                 return;
                             }
